@@ -26,11 +26,19 @@ enum GAME_FLAG {
 	DRUMROLL,
 	TARGET_MISSED,
 	TARGET_HIGHLIGHT,
-	hamFIVE,	// not implemented	
-	COUNTUP,		// not implemented
+	ROUND_BUFFER,	
+	COUNTUP,		
 	hamSEVEN,	// not implemented
 	hamEIGHT,	// not implemented
 	GAME_PAUSED		
+};
+
+enum BUTTON_ID {
+	PLAY,
+	PLAY_AGAIN,
+	QUIT,
+	MUTE,
+	PAUSE
 };
 
 #endif

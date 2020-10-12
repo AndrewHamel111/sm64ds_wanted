@@ -23,7 +23,7 @@ void updateTargets(std::vector<target>& targets, double time)
 
 float randomSpeed()
 {
-	return static_cast<float>(BASE_SPEED + ((rand() % 100) / 100) - (BASE_SPEED * 0.25));
+	return static_cast<float>(BASE_SPEED + (static_cast<float>(rand() % 100) / 100) - (BASE_SPEED * 0.25));
 }
 
 double randomAngle()
@@ -416,9 +416,9 @@ void DrawTarget(target t, Texture2D facesSmallTexture)
 	#endif
 }
 
-Rectangle GetDigit(int digit)
+Rectangle GetDigitRect(int digit)
 {
-	return Rectangle{214 + (digit * 30), 0, 30, 30};
+	return Rectangle{470 + (digit * 30), 100, 30, 30};
 }
 
 void tickSeconds(int& seconds, int& frames)
@@ -448,12 +448,53 @@ int AlarmDuration(GAME_FLAG f)
 		case TARGET_HIGHLIGHT:
 			a *= TARGET_HIGHLIGHT_DURATION;
 			break;
+		case ROUND_BUFFER:
+			a *= ROUND_BUFFER_DURATION;
+			break;
 		case COUNTUP:
 			a *= SCORE_COUNTUP_DURATION;
 			break;
 	}
 	
 	return a;
+}
+
+/// uses the digits from the atlas to display a number at a given position.
+void DrawNumberAt(Texture2D atlas, int num, Vector2 center)
+{
+	if (num < 10)
+	{
+		DrawTextureRec(atlas, GetDigitRect(num), Vector2{center.x - 15, center.y + 15}, WHITE);
+	}
+	else if (num < 100)
+	{
+		DrawTextureRec(atlas, GetDigitRect(num / 10), Vector2{center.x - 31, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 1, center.y + 15}, WHITE);
+	}
+	else if (num < 1000)
+	{
+		DrawTextureRec(atlas, GetDigitRect(num / 100), Vector2{center.x - 47, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect((num / 10) % 10), Vector2{center.x - 15, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 17, center.y + 15}, WHITE);
+	}
+	else if (num < 10000)
+	{
+		DrawTextureRec(atlas, GetDigitRect(num / 1000), Vector2{center.x - 63, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect((num / 100) % 10), Vector2{center.x - 31, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect((num / 10) % 10), Vector2{center.x + 1, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 33, center.y + 15}, WHITE);
+	}
+}
+
+/// specializes DrawNumberAt to be especially for the round timer (turning the numbers red in the last 5 seconds)
+void DrawTimerAt(Texture2D atlas, int num, Vector2 center)
+{
+	if (num < 6)
+	{
+		DrawTextureRec(atlas, GetDigitRect(num), Vector2{center.x - 15, center.y + 15}, MAROON);
+	}
+	else
+		DrawNumberAt(atlas, num, center);
 }
 
 #endif

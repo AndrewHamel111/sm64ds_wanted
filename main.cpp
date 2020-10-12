@@ -18,17 +18,20 @@ https://www.youtube.com/watch?v=WePBtu63J_4
 - implement a frames variable and a seconds variable that track time.
 	right answers are extra extra seconds, and at the end of each level the frames counter resets
 	(so we're always round up for the player)
+- form a distinction (by var name) between SourceRects and DestRects. i.e. RECT_TIME -> SOURCE_RECT_TIME
 
 ********************************************************************************************/
 
 #include "raylib.h"
 #define NEARBLACK CLITERAL(Color){ 20, 20, 20, 255}
+#define MUSTARD CLITERAL(Color){ 203, 182, 51, 255}
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
 #include <iostream>
 #include <cmath>
+#include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <vector>
@@ -36,16 +39,21 @@ https://www.youtube.com/watch?v=WePBtu63J_4
 
 //Rectangle spriteRects[] = { Rectangle{0,0,25,32}, Rectangle{25,0,28,32}, Rectangle{53,0,23,32}, Rectangle{76,0,30,32} };
 // SPRITE SOURCE RECTANGLES, IMPORTANT TO CHANGE IF/WHEN SOURCE SPRITE CHANGES
-Rectangle spriteRects[] = { Rectangle{0,0,100,100}, Rectangle{100,0,100,100},Rectangle{200,0,100,100},Rectangle{300,0,100,100}};
-//Rectangle posterRects[] = { Rectangle{0,0,82,67}, Rectangle{82,0,82,67},Rectangle{164,0,82,67},Rectangle{246,0,82,67}};
+Rectangle spriteRects[] = { Rectangle{76,0,100,100}, Rectangle{332,0,100,100},Rectangle{588,0,100,100},Rectangle{844,0,100,100}};
+Rectangle posterRects[] = { Rectangle{76,316,100,100}, Rectangle{332,316,100,100},Rectangle{588,316,100,100},Rectangle{844,316,100,100}};
 
-Rectangle RECT_TIME 	= Rectangle{0, 0, 64, 16};
-Rectangle RECT_LEVEL 	= Rectangle{64, 0, 150, 30};
-Rectangle RECT_PLAY 	= Rectangle{0, 30, 256, 76};
-Rectangle RECT_PLAY_AGAIN = Rectangle{256, 30, 256, 76};
-Rectangle RECT_QUIT 	= Rectangle{512, 30, 256, 76};
-Rectangle RECT_NONTENDO = Rectangle{0, 106, 312, 80};
-Rectangle RECT_2020 	= Rectangle{0, 186, 112, 30};
+Rectangle posterSourceRect = Rectangle{0,100, 256, 192};
+
+Rectangle RECT_TIME 		= Rectangle{256, 100, 64, 16};
+Rectangle RECT_LEVEL 		= Rectangle{320, 100, 150, 30};
+//Rectangle RECT_DIGIT_ZERO 	= Rectangle{470, 100, 30, 30};
+Rectangle RECT_PLAY 		= Rectangle{256, 130, 256, 76};
+Rectangle RECT_PLAY_AGAIN 	= Rectangle{512, 130, 256, 76};
+Rectangle RECT_QUIT 		= Rectangle{768, 130, 256, 76};
+Rectangle RECT_NONTENDO	 	= Rectangle{256, 206, 312, 80};
+Rectangle RECT_2020 		= Rectangle{256, 286, 112, 30};
+Rectangle RECT_UNMUTED		= Rectangle{568, 206, 80, 80};
+Rectangle RECT_MUTED		= Rectangle{648, 206, 80, 80};
 
 #include "constants.h"
 #include "enums.h"
@@ -61,16 +69,13 @@ int main(void)
 
 	// Initialization
 	//--------------------------------------------------------------------------------------
-	const int screenWidth = SCREEN_WIDTH;
-	const int screenHeight = SCREEN_HEIGHT;
 
 	std::srand(std::time(0));
 
-	InitWindow(screenWidth, screenHeight, "applesauce");
+	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "WANTED!");
 	InitAudioDevice();
 
 	// Window Settings
-	//HideCursor();		// prevents the cursor from being displayed
 
 	// Game Initialization
 	int level = 0; // 0 is menu, -1 is settings
@@ -118,15 +123,13 @@ int main(void)
 
 
 	// Graphics Stuff
-	Texture2D faces 	= LoadTexture("textures/faces.png");
-	Texture2D faces_alt 	= LoadTexture("textures/faces_alt.png");
-	Texture2D uiTexture		= LoadTexture("textures/ui.png");
+	Texture2D atlas = LoadTexture("textures/atlas.png");
 	
-	Texture2D poster = LoadTexture("textures/wanted.png");
-	Rectangle posterSourceRect = Rectangle{0,0, 256, 192};
-	const Vector2 posterPos = Vector2{272,600};
+	/// position for the vector on screen
+	const Vector2 posterPos = Vector2{SCREEN_WIDTH/2 - (256/2), AREA_HEIGHT};
 	
-	const Rectangle bottomBarRect = Rectangle{0,600,800,192};
+	/// rect for the area below the play area (bottom bar)
+	const Rectangle bottomBarRect = Rectangle{0,AREA_HEIGHT,SCREEN_WIDTH,SCREEN_HEIGHT - AREA_HEIGHT};
 
 
 	// Audio stuff
@@ -146,7 +149,7 @@ int main(void)
 	alarm[2] -	drumrollAlarm				|	drumrollFlag			|	DRUMROLL_ALARM_DURATION
 	alarm[3] - 	targetMissedAlarm			|	targetMissedFlag		|	TARGET_MISSED_ALARM_DURATION
 	alarm[4] -	targetHighlightAlarm		|	targetHighlightFlag		|	TARGET_HIGHLIGHT_DURATION
-	alarm[5] -	
+	alarm[5] -	roundBuffer
 	alarm[6] -	scoreCountupAlarm
 	alarm[7] -
 	alarm[8] -
@@ -163,11 +166,15 @@ int main(void)
 	// scoreCountupFlag
 	bool flags[10] = {false};// linked with alarms by enum GAME_FLAG
 	
+	// counter[0] - used for countup
+	int counter[2] = {0};
+	
 	int secondCounter = 10;
 	int frameCounter = FPS_TARGET;
 
 	SetTargetFPS(FPS_TARGET);               // Set framerate
 	SetExitKey(KEY_BACKSPACE);
+	//SetTextureWrap(atlas, WRAP_MIRROR_CLAMP);
 
 	//PlaySound(bgm);
 	PlayMusicStream(bgm);
@@ -229,9 +236,20 @@ int main(void)
 		if (flags[COUNTUP] && alarm[COUNTUP] == 0)
 		{
 			flags[COUNTUP] = false;
+			counter[0] = 0;
+			
+			// increment level variable
+			level++;
+			
+			flags[ROUND_BUFFER] = true;
+			alarm[ROUND_BUFFER] = AlarmDuration(ROUND_BUFFER);
+			
+		}	// }#	
+		if (flags[ROUND_BUFFER] && alarm[ROUND_BUFFER] == 0)
+		{
+			flags[ROUND_BUFFER] = false;
 			
 			// initialize the next level
-			level++;
 			initializeLevel(allTargets, level);
 			
 			// assign pre-round based on level number
@@ -260,7 +278,17 @@ int main(void)
 		else if (flags[COUNTUP])
 		{
 			// update score as alarm ticks down
-			//if (alarm)
+			//int _a = static_cast<int>(SCORE_COUNTUP_DURATION * FPS_TARGET);
+			//int _a = static_cast<int>(FPS_TARGET/3);
+			//_a -= (_a % 5);	// now 5 | _a
+			
+			if (((alarm[COUNTUP] % (FPS_TARGET/12)) == 0) && counter[0] < 5)// && alarm[COUNTUP] > SCORE_COUNTUP_DURATION * 0.5)
+			{
+				counter[0]++;
+				secondCounter++;
+			}
+			
+			if (secondCounter > 99) secondCounter = 99;
 		}
 		// PREROUND UPDATE
 		else if (flags[PREROUND])
@@ -351,12 +379,12 @@ int main(void)
 					buttonStart = false;
 
 					// initalize first level
-					level = 1;
+					level = FIRST_LEVEL;
 					
 					flags[GAME_IN_PLAY] = false;
-					flags[DRUMROLL] = true;
-					alarm[DRUMROLL] = AlarmDuration(DRUMROLL);
-					initializeLevel(allTargets, level);
+					flags[ROUND_BUFFER] = true;
+					alarm[ROUND_BUFFER] = AlarmDuration(ROUND_BUFFER);
+					//initializeLevel(allTargets, level);
 				}
 				else if (buttonOptions)
 				{
@@ -400,9 +428,9 @@ int main(void)
 				// buttonOptions 	= GuiButton(buttonOptionsRect, 	buttonOptionsLabel);
 				// buttonQuit 		= GuiButton(buttonQuitRect, 	buttonQuitLabel);
 				
-				buttonStart = GuiImageButtonEx(buttonStartRect, "", uiTexture, RECT_PLAY);
+				buttonStart = GuiImageButtonEx(buttonStartRect, "", atlas, RECT_PLAY);
 				//buttonOptions = GuiImageButtonEx(buttonOptionsRect, "", uiTexture, RECT_OPTIONS);
-				buttonQuit = GuiImageButtonEx(buttonQuitRect, "", uiTexture, RECT_QUIT);
+				buttonQuit = GuiImageButtonEx(buttonQuitRect, "", atlas, RECT_QUIT);
 				
 			}/*}#*/
 			/* DRAW OPTIONS MENU  #{*/	
@@ -421,21 +449,45 @@ int main(void)
 				// PREROUND DRAW
 				else if (flags[PREROUND])
 				{
+					ClearBackground(NEARBLACK);
+					Rectangle r; 
+					
+					if (level % 2 == 0)
+					{
+						r = posterRects[0];
+						r.x -= 768.0f * static_cast<float>(static_cast<float>(alarm[PREROUND]) / static_cast<float>(PREROUND_ALARM_DURATION)) / (FPS_TARGET/6);
+					}
+					else
+					{
+						r = posterRects[3];
+						r.x += 768.0f * static_cast<float>(static_cast<float>(alarm[PREROUND]) / static_cast<float>(PREROUND_ALARM_DURATION)) / (FPS_TARGET/6);
+					}
+					
+					DrawRectangleRec(bottomBarRect, NEARBLACK);
+					DrawTextureRec(atlas, posterSourceRect, posterPos, WHITE); 
+					DrawTextureRec(atlas, r, Vector2{posterPos.x + 80,posterPos.y + 19}, WHITE);
 					// TODO implement this whole section.
 					// play the animation of the slow reveal of the target
 				}
-				// DRUMROLL DRAW
-				else if (flags[DRUMROLL])	// DON'T EXPOSE THE LOCATIONS OF THE TARGETS YET
+				// BETWEEN ROUNDS, DRAW
+				else if (flags[ROUND_BUFFER])	// Show name of the round
 				{
-
+					ClearBackground(NEARBLACK);
+					DrawTextureRec(atlas, RECT_LEVEL, Vector2{SCREEN_WIDTH/2 - 75, AREA_HEIGHT/2 - 15}, WHITE);
+					DrawNumberAt(atlas, level, Vector2{SCREEN_WIDTH/2, AREA_HEIGHT/2 + 8});
 				}
+				// DRUMROLL DRAW	NOT YET IMPLEMENTED AND MIGHT BE DEPRECATED, BREAKS FLOW ALOT
+				else if (flags[DRUMROLL])
+				{}
 				// MAIN DRAW
 				else
 				{
 					// TODO change how this works probably
-					if (alarm[3] > 0.5 * AlarmDuration(TARGET_MISSED))	// red background
+					if (alarm[3] > 0)//0.5 * AlarmDuration(TARGET_MISSED))	// red background
 						ClearBackground(MAROON);
-					else												// white background
+					else if (flags[TARGET_HIGHLIGHT] || flags[COUNTUP])												// yellow
+						ClearBackground(MUSTARD);
+					else 
 						ClearBackground(NEARBLACK);
 
 					// draw all targets
@@ -445,32 +497,37 @@ int main(void)
 						auto iEnd = allTargets.end();
 						for(; iter != iEnd; iter++)
 						{
-							DrawTarget(*iter, faces);
+							DrawTarget(*iter, atlas);
 						}
 					}
 					else
 					{
-						DrawTarget(allTargets[0], faces);
+						DrawTarget(allTargets[0], atlas);
 					}
 					
-					Texture2D _tex;
+					Rectangle r = allTargets[0].getSpriteRect();
 					
 					#ifdef USE_DS_STYLE
-						// DS version (uses a faces_alt)
-					_tex = faces_alt;
+					// DS version (uses a faces_alt)
+					// translate the source rect over to the alt side
+					r.y += 316;
 					#else
-						// My version (uses the base faces)
-					_tex = faces;
+					// My version (uses the base faces)
+					// don't change the spriterect
 					#endif
 					
-					Rectangle r = allTargets[0].getSpriteRect();
 					DrawRectangleRec(bottomBarRect, NEARBLACK);
-					DrawTextureRec(poster, posterSourceRect, posterPos, WHITE); 
-					DrawTextureRec(_tex, r, Vector2{posterPos.x + 80,posterPos.y + 19}, WHITE);
+					DrawTextureRec(atlas, posterSourceRect, posterPos, WHITE); 
+					DrawTextureRec(atlas, r, Vector2{posterPos.x + 80,posterPos.y + 19}, WHITE);
 					
-					if (flags[9])
-					DrawRectangleRec(bottomBarRect, MAROON);
+					// draw time left
+					DrawTextureRec(atlas, RECT_TIME, Vector2{posterPos.x + 288, posterPos.y + 8}, WHITE);
+					DrawTimerAt(atlas, secondCounter, Vector2{posterPos.x + 320, posterPos.y + 23});
 					
+					//		secondCounter / 10 -> digit[0]
+					//    	secondCounter % 10 -> digit[1]
+					// DrawTextureRec(atlas, GetDigitRect(secondCounter / 10), Vector2{posterPos.x + 288, posterPos.y + 38}, WHITE);
+					// DrawTextureRec(atlas, GetDigitRect(secondCounter % 10), Vector2{posterPos.x + 320, posterPos.y + 38}, WHITE);					
 				}	
 				
 			}	// }#

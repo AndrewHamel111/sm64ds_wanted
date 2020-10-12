@@ -238,7 +238,7 @@ void target::setAngleDegrees(int degrees)
 
 void target::setSpeed(float speed)
 {
-	this->speed = (speed > 0) ? speed : 1;
+	this->speed = speed;
 }
 
 void target::setSpriteRect(Rectangle rect)
@@ -303,10 +303,10 @@ void target::move(double time)
 		case DIRECTION_SIN:
 			// first we build a vector that represents the displacement applied by sin (if the target was moving Right)
 			v.x = speed;
-			v.y = static_cast<float>(speed * sinAmplitude * sin(4 * PI * time));
+			v.y = speed * static_cast<float>(sinAmplitude * sin(4 * PI * time));
 
-			position.x += v.x * cos(angle) - v.y * sin(angle);
-			position.y -= v.x * sin(angle) + v.y * cos(angle);
+			position.x += speed *( v.x * cos(angle) - v.y * sin(angle));
+			position.y -= speed *( v.x * sin(angle) + v.y * cos(angle));
 			break;
 		case STATIONARY:;
 			// do nothing
