@@ -395,13 +395,13 @@ void target::DrawTarget()
 {	
 	// color based on sprite version
 	Color col;
-	if (spriteRect == spriteRects[0]) // RECT_LUIGI
+	if (spriteRect == spriteRects[0]) // RECT_ONE
 		col = GOLD;
-	else if (spriteRect == spriteRects[1]) // RECT_MARIO
+	else if (spriteRect == spriteRects[1]) // RECT_TWO
 		col = ORANGE;
-	else if (spriteRect == spriteRects[2]) // RECT_YOSHI
+	else if (spriteRect == spriteRects[2]) // RECT_THREE
 		col = SKYBLUE;
-	else if (spriteRect == spriteRects[3]) // RECT_WARIO
+	else if (spriteRect == spriteRects[3]) // RECT_FOUR
 		col = LIME;
 	else
 		col = BLACK;

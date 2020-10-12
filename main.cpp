@@ -37,7 +37,7 @@ https://www.youtube.com/watch?v=WePBtu63J_4
 //Rectangle spriteRects[] = { Rectangle{0,0,25,32}, Rectangle{25,0,28,32}, Rectangle{53,0,23,32}, Rectangle{76,0,30,32} };
 // SPRITE SOURCE RECTANGLES, IMPORTANT TO CHANGE IF/WHEN SOURCE SPRITE CHANGES
 Rectangle spriteRects[] = { Rectangle{0,0,100,100}, Rectangle{100,0,100,100},Rectangle{200,0,100,100},Rectangle{300,0,100,100}};
-Rectangle posterRects[] = { Rectangle{0,0,82,67}, Rectangle{82,0,82,67},Rectangle{164,0,82,67},Rectangle{246,0,82,67}};
+//Rectangle posterRects[] = { Rectangle{0,0,82,67}, Rectangle{82,0,82,67},Rectangle{164,0,82,67},Rectangle{246,0,82,67}};
 
 Rectangle RECT_TIME 	= Rectangle{0, 0, 64, 16};
 Rectangle RECT_LEVEL 	= Rectangle{64, 0, 150, 30};
@@ -118,9 +118,9 @@ int main(void)
 
 
 	// Graphics Stuff
-	Texture2D facesSmallTexture = LoadTexture("textures/mario_faces.png");
-	Texture2D facesLargeTexture = LoadTexture("textures/wanted_faces_big.png");
-	Texture2D uiTexture			= LoadTexture("textures/ui.png");
+	Texture2D faces 	= LoadTexture("textures/faces.png");
+	Texture2D faces_alt 	= LoadTexture("textures/faces_alt.png");
+	Texture2D uiTexture		= LoadTexture("textures/ui.png");
 	
 	Texture2D poster = LoadTexture("textures/wanted.png");
 	Rectangle posterSourceRect = Rectangle{0,0, 256, 192};
@@ -132,10 +132,10 @@ int main(void)
 	// Audio stuff
 	Music bgm = LoadMusicStream("snd/bgm.ogg");
 	
-	Sound luigi[] = { LoadSound("snd/luigi/luigi.wav")};	//, LoadSound("snd/luigi/luigi2.wav")};
-	Sound mario[] = { LoadSound("snd/mario/mario.wav"), LoadSound("snd/mario/mario2.wav"), LoadSound("snd/mario/mario3.wav"), LoadSound("snd/mario/mario4.wav")};
-	Sound yoshi[] = { LoadSound("snd/yoshi/yoshi.wav"), LoadSound("snd/yoshi/yoshi2.wav")};
-	Sound wario[] = { LoadSound("snd/wario/wario.wav"), LoadSound("snd/wario/wario2.wav"), LoadSound("snd/wario/wario3.wav")};
+	Sound one[] = { LoadSound("snd/one.wav")};
+	Sound two[] = { LoadSound("snd/two.wav"), LoadSound("snd/two2.wav"), LoadSound("snd/two3.wav"), LoadSound("snd/two4.wav")};
+	Sound three[] = { LoadSound("snd/three.wav"), LoadSound("snd/three2.wav")};
+	Sound four[] = { LoadSound("snd/four.wav"), LoadSound("snd/four2.wav"), LoadSound("snd/four3.wav")};
 	
 	Sound points = LoadSound("snd/points.wav");
 
@@ -146,7 +146,7 @@ int main(void)
 	alarm[2] -	drumrollAlarm				|	drumrollFlag			|	DRUMROLL_ALARM_DURATION
 	alarm[3] - 	targetMissedAlarm			|	targetMissedFlag		|	TARGET_MISSED_ALARM_DURATION
 	alarm[4] -	targetHighlightAlarm		|	targetHighlightFlag		|	TARGET_HIGHLIGHT_DURATION
-	alarm[5] -	roundTimeDepletedAlarm
+	alarm[5] -	
 	alarm[6] -	scoreCountupAlarm
 	alarm[7] -
 	alarm[8] -
@@ -300,14 +300,14 @@ int main(void)
 								
 								flags[GAME_IN_PLAY] = false;
 								
-								if (allTargets[0].getSpriteRect() == spriteRects[RECT_LUIGI])
-									PlaySound(luigi[0]);
-								else if (allTargets[0].getSpriteRect() == spriteRects[RECT_MARIO])
-									PlaySound(mario[rand() % 4]);
-								else if (allTargets[0].getSpriteRect() == spriteRects[RECT_YOSHI])
-									PlaySound(yoshi[rand() % 2]);
+								if (allTargets[0].getSpriteRect() == spriteRects[RECT_ONE])
+									PlaySound(one[0]);
+								else if (allTargets[0].getSpriteRect() == spriteRects[RECT_TWO])
+									PlaySound(two[rand() % 4]);
+								else if (allTargets[0].getSpriteRect() == spriteRects[RECT_THREE])
+									PlaySound(three[rand() % 2]);
 								else
-									PlaySound(wario[rand() % 3]);
+									PlaySound(four[rand() % 3]);
 							}
 							else	// MISSED TARGET
 							{
@@ -445,36 +445,28 @@ int main(void)
 						auto iEnd = allTargets.end();
 						for(; iter != iEnd; iter++)
 						{
-							#ifndef USE_DEV_SQUARES
-							DrawTarget(*iter, facesSmallTexture);
-							#else
-							DrawTarget(*iter);
-							#endif
+							DrawTarget(*iter, faces);
 						}
 					}
 					else
 					{
-						#ifndef USE_DEV_SQUARES
-						DrawTarget(allTargets[0], facesSmallTexture);
-						#else
-						DrawTarget(allTargets[0]);
-						#endif
+						DrawTarget(allTargets[0], faces);
 					}
 					
-					#ifdef USE_DS_STYLE
-					// DS version
-					int z = allTargets[0].getSpriteRect().x / 100;
-					DrawRectangleRec(bottomBarRect, NEARBLACK);
-					DrawTextureRec(poster, posterSourceRect, posterPos, WHITE); 
-					DrawTextureRec(facesLargeTexture, posterRects[z], Vector2{posterPos.x + 87,posterPos.y + 52}, WHITE);
+					Texture2D _tex;
 					
+					#ifdef USE_DS_STYLE
+						// DS version (uses a faces_alt)
+					_tex = faces_alt;
 					#else
-					// My version
+						// My version (uses the base faces)
+					_tex = faces;
+					#endif
+					
 					Rectangle r = allTargets[0].getSpriteRect();
 					DrawRectangleRec(bottomBarRect, NEARBLACK);
 					DrawTextureRec(poster, posterSourceRect, posterPos, WHITE); 
-					DrawTextureRec(facesSmallTexture, r, Vector2{posterPos.x + 78,posterPos.y + 28}, WHITE);
-					#endif
+					DrawTextureRec(_tex, r, Vector2{posterPos.x + 80,posterPos.y + 19}, WHITE);
 					
 					if (flags[9])
 					DrawRectangleRec(bottomBarRect, MAROON);

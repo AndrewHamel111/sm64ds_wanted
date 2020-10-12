@@ -147,10 +147,10 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				spots.push_back(Vector2{4 * TARGET_HEIGHT, 3 * TARGET_HEIGHT});
 				
 				// alternate constructor for stationary templates
-				templates.emplace_back(spriteRects[RECT_LUIGI]);
-				templates.emplace_back(spriteRects[RECT_MARIO]);
-				templates.emplace_back(spriteRects[RECT_YOSHI]);
-				templates.emplace_back(spriteRects[RECT_WARIO]);
+				templates.emplace_back(spriteRects[RECT_ONE]);
+				templates.emplace_back(spriteRects[RECT_TWO]);
+				templates.emplace_back(spriteRects[RECT_THREE]);
+				templates.emplace_back(spriteRects[RECT_FOUR]);
 		}
 		else if (level == 2)
 		{			
@@ -163,10 +163,10 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 					}
 				}
 
-				templates.emplace_back(spriteRects[RECT_LUIGI]);
-				templates.emplace_back(spriteRects[RECT_MARIO]);
-				templates.emplace_back(spriteRects[RECT_YOSHI]);
-				templates.emplace_back(spriteRects[RECT_WARIO]);
+				templates.emplace_back(spriteRects[RECT_ONE]);
+				templates.emplace_back(spriteRects[RECT_TWO]);
+				templates.emplace_back(spriteRects[RECT_THREE]);
+				templates.emplace_back(spriteRects[RECT_FOUR]);
 		}
 		else if (level == 3)
 		{
@@ -179,20 +179,20 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 					}
 				}
 
-				templates.emplace_back(spriteRects[RECT_LUIGI]);
-				templates.emplace_back(spriteRects[RECT_MARIO]);
-				templates.emplace_back(spriteRects[RECT_YOSHI]);
-				templates.emplace_back(spriteRects[RECT_WARIO]);
+				templates.emplace_back(spriteRects[RECT_ONE]);
+				templates.emplace_back(spriteRects[RECT_TWO]);
+				templates.emplace_back(spriteRects[RECT_THREE]);
+				templates.emplace_back(spriteRects[RECT_FOUR]);
 		}
 		// levels 4, 5, 7, 8, 9, 13, 15, 17. 18, 20
 		else if (level == 4 || level == 5 || level == 7 || level == 8 || level == 9 || level == 13 || level == 15 || level == 17 || level == 18 || level == 20)
 		{
 				spots = generateSpots(4 * (12 + level));
 				
-				templates.emplace_back(spriteRects[RECT_LUIGI]);
-				templates.emplace_back(spriteRects[RECT_MARIO]);
-				templates.emplace_back(spriteRects[RECT_YOSHI]);
-				templates.emplace_back(spriteRects[RECT_WARIO]);
+				templates.emplace_back(spriteRects[RECT_ONE]);
+				templates.emplace_back(spriteRects[RECT_TWO]);
+				templates.emplace_back(spriteRects[RECT_THREE]);
+				templates.emplace_back(spriteRects[RECT_FOUR]);
 		}
 		else if (level == 6)
 		{
@@ -289,37 +289,37 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 		{
 			spots = generateSpots(4 * (12 + level));
 			
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_LUIGI]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_MARIO]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_YOSHI]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_WARIO]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
 		}
 		else if (level == 12)	// DIRECTION_SIN (up or down)
 		{
 			spots = generateSpots(4 * (12 + level));
 			
-			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_LUIGI]);
-			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_MARIO]);
-			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_YOSHI]);
-			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_WARIO]);
+			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_FOUR]);
 		}
 		else if (level == 14)	// DIRECTION_ANGLE_W_BOUNCE
 		{
 			spots = generateSpots(4 * (12 + level));
 			
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_LUIGI]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_MARIO]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_YOSHI]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_WARIO]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
 		}
 		else if (level == 19)	// DIRECTION_SIN
 		{
 			spots = generateSpots(4 * (12 + level));
 			
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_LUIGI]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_MARIO]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_YOSHI]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_WARIO]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
 		}
 	}
 	else if (level >= 21)
@@ -333,40 +333,40 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 		// STATIONARY
 			spots = generateSpots(num);
 			
-			templates.emplace_back(spriteRects[RECT_LUIGI]);
-			templates.emplace_back(spriteRects[RECT_MARIO]);
-			templates.emplace_back(spriteRects[RECT_YOSHI]);
-			templates.emplace_back(spriteRects[RECT_WARIO]);
+			templates.emplace_back(spriteRects[RECT_ONE]);
+			templates.emplace_back(spriteRects[RECT_TWO]);
+			templates.emplace_back(spriteRects[RECT_THREE]);
+			templates.emplace_back(spriteRects[RECT_FOUR]);
 		}
 		else if (20 <= level_type && level_type < 40)
 		{
 		// DIRECTION_ANGLE
 			spots = generateSpots(num);
 			
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_LUIGI]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_MARIO]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_YOSHI]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_WARIO]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
 		}
 		else if (40 <= level_type && level_type < 60)
 		{
 		// DIRECTION_SIN
 			spots = generateSpots(num);
 			
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_LUIGI]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_MARIO]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_YOSHI]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_WARIO]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
 		}
 		else if (60 <= level_type && level_type < 80)
 		{
 		// DIRECTION_ANGLE_W_BOUNCE
 			spots = generateSpots(num);
 			
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_LUIGI]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_MARIO]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_YOSHI]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_WARIO]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
 		}
 		/*
 		else if (80 <= level_type && level_type < 85)
@@ -395,26 +395,25 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 	return targets;
 }
 
-void DrawTarget(target t)
+void DrawTarget(target t, Texture2D facesSmallTexture)
 {
-	// color based on sprite version
+	#ifndef USE_DEV_SQUARES
+	// use faces.png
+	DrawTextureRec(facesSmallTexture, t.getSpriteRect(), t.getPos(), RAYWHITE); 
+	#else
+	// dev textures
 	Color col;
-	if (t.getSpriteRect() == spriteRects[0]) // RECT_LUIGI
-		col = DARKGREEN;
-	else if (t.getSpriteRect() == spriteRects[1]) // RECT_MARIO
-		col = RED;
-	else if (t.getSpriteRect() == spriteRects[2]) // RECT_YOSHI
+	if (t.getSpriteRect() == spriteRects[0]) // RECT_ONE
 		col = LIME;
-	else //if (t->getSpriteRect() == spriteRects[3]) // RECT_WARIO
+	else if (t.getSpriteRect() == spriteRects[1]) // RECT_TWO
+		col = RED;
+	else if (t.getSpriteRect() == spriteRects[2]) // RECT_THREE
+		col = ORANGE;
+	else //if (t->getSpriteRect() == spriteRects[3]) // RECT_FOUR
 		col = GOLD;
 	
 	DrawRectangle(t.getX(), t.getY(), 100, 100, col);
-}
-
-void DrawTarget(target t, Texture2D facesSmallTexture)
-{
-	// mario sprites
-	DrawTextureRec(facesSmallTexture, t.getSpriteRect(), t.getPos(), RAYWHITE); 
+	#endif
 }
 
 Rectangle GetDigit(int digit)

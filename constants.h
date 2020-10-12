@@ -23,6 +23,7 @@
 
 #define CLICK_RANGE 6000
 
+// times are given in seconds
 #define PREROUND_ALARM_DURATION 1
 #define DRUMROLL_ALARM_DURATION 2
 #define TARGET_MISSED_ALARM_DURATION 1

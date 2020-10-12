@@ -14,10 +14,10 @@ enum MoveAI {			// description													related members		(all members use the
 
 enum SpriteRectEnum
 {
-	RECT_LUIGI,	// = Rectangle{0,0,25,32},
-	RECT_MARIO,	// = Rectangle{25,0,28,32},
-	RECT_YOSHI,	// = Rectangle{53,0,23,32},
-	RECT_WARIO	// = Rectangle{76,0,30,32}
+	RECT_ONE,	// Rectangle{0,0,100,100}	
+	RECT_TWO,	// Rectangle{100,0,100,100}	
+	RECT_THREE,	// Rectangle{200,0,100,100}	
+	RECT_FOUR	// Rectangle{300,0,100,100}	
 };
 
 enum GAME_FLAG {
