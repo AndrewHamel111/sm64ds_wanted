@@ -1,0 +1,15 @@
+OG game
+
+	all stationary,
+	all direction_angle,
+	all direction_sin,
+	all direction_angle_w_bounce,
+
+My additions
+
+	each template can have any one of the above
+	i.e. luigi's are stationary, marios are angle_w_bounce,
+		warios are direction_sin and yoshi is angle
+
+	the 8x6 stationary can happen at any time (rare)
+	8x6 with like columns (rare)

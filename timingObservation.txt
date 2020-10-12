@@ -1,0 +1,11 @@
+target selected, "correct" sound plays and the character's voice line plays
+
+1 second passes [targetHighlightFlag]
+
+score is increased by 5
+
+2 seconds pass
+
+drumroll begins (takes one second) [preround flag]
+
+round starts

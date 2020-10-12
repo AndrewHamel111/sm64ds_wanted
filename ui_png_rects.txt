@@ -1,0 +1,13 @@
+TIME Rectangle{0, 0, 64, 16}
+LEVEL Rectangle{64, 0, 150, 30}
+
+(really a function)
+DIGITS {214 + (n * 30), 0, 30, 30}
+
+PLAY Rectangle{0, 30, 256, 76}
+PLAY AGAIN Rectangle{256, 30, 256, 76}
+QUIT Rectangle{512, 30, 256, 76}
+NONTENDO Rectangle{0, 106, 312, 80}
+2020 Rectangle{0, 186, 112, 30}
+
+digits are 30,30
