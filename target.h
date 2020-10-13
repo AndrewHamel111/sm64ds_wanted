@@ -8,10 +8,10 @@ struct target_template
 	double angle;
 	float speed;
 	Rectangle rect;
-	
+
 	target_template(Rectangle r): movetype{STATIONARY}, angle{0}, speed{0}, rect{r}
 	{}
-	
+
 	target_template(MoveAI m, double a, float s, Rectangle r): movetype{m}, angle{a}, speed{s}, rect{r}
 	{}
 };
@@ -77,7 +77,7 @@ public:
 
 	bool isWanted() const;
 	bool isMenu() const;
-	
+
 	Rectangle getSpriteRect() const;
 
 	// update methods
@@ -169,13 +169,13 @@ target::target(Vector2 pos, target_template t): sinAmplitude{BASE_SIN_AMPLITUDE}
 target::target(Vector2 pos, Rectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(pos);
-	
+
 	setMoveType(STATIONARY);
 	setWanted(false);
 
 	setAngle(0);
 	setSpeed(0);
-	
+
 	setSpriteRect(spriteRect);
 }
 /*}#*/
@@ -316,7 +316,7 @@ void target::move(double time)
 		case DIRECTION_SIN:
 			// first we build a vector that represents the displacement applied by sin (if the target was moving Right)
 			v.x = speed;
-			v.y = speed * static_cast<float>(sinAmplitude * sin(4 * PI * time));
+			v.y = static_cast<float>(sinAmplitude * sin(4 * PI * time));
 
 			position.x += speed *( v.x * cos(angle) - v.y * sin(angle));
 			position.y -= speed *( v.x * sin(angle) + v.y * cos(angle));
@@ -334,7 +334,7 @@ void target::wrap()
 		upperW = SCREEN_WIDTH;
 		upperH = SCREEN_HEIGHT;
 	}
-	
+
 	// // check edges		// 10 is used just as a safety blanky to protect from scary double rounding errors
 	if (position.x > upperW 	+ TARGET_HEIGHT + 10)		// off right edge
 		position.x = 0 - TARGET_HEIGHT;
@@ -412,7 +412,7 @@ bool operator==(const Rectangle& lhs, const Rectangle& rhs)
 /// deprecated: moved to gameFuncs.h as a static function
 /*
 void target::DrawTarget()
-{	
+{
 	// color based on sprite version
 	Color col;
 	if (spriteRect == spriteRects[0]) // RECT_ONE
@@ -425,7 +425,7 @@ void target::DrawTarget()
 		col = LIME;
 	else
 		col = BLACK;
-	
+
 	DrawRectangle(position.x, position.y, 100, 100, col);
 	Vector2 temp = getCenter();
 	DrawRectangle(temp.x, temp.y, 5,5, BLACK);

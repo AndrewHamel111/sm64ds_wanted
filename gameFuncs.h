@@ -49,7 +49,7 @@ Vector2 randomXY()
 Vector2 randomXYWithConsideration(std::vector<Vector2>& spots)
 {
 	if (spots.size() < 1) return randomXY();
-	
+
 	bool flag = true;
 
 	Vector2 x;
@@ -61,9 +61,9 @@ Vector2 randomXYWithConsideration(std::vector<Vector2>& spots)
 
 		for(Vector2 v : spots)
 			if (hamelDistanceCenter(x, v) < TARGET_MINIMUM_DISTANCE)
-				flag = true;		
+				flag = true;
 	}
-	
+
 	return x;
 }
 
@@ -72,7 +72,7 @@ std::vector<Vector2> generateSpots(int num)
 	std::vector<Vector2> spots;
 	for(int i = 0; i < num; i++)
 		spots.push_back(randomXYWithConsideration(spots));
-	
+
 	return spots;
 }
 
@@ -85,19 +85,19 @@ void populateWithRandomTargets(std::vector<target>& targets, std::vector<Vector2
 	std::random_device rd;
 	std::mt19937 g(rd());
 	g.seed(std::time(0));
-	
+
 	// mix up the spots set
 	std::shuffle(spots.begin(), spots.end(), g);
-	
+
 	// and the templates
 	std::shuffle(templates.begin(), templates.end(), g);
 
 	// size of spots
 	int j = spots.size();
-	
+
 	// index of next template
 	int l = 0;
-	
+
 	for(int i = 0; i < j; i++)
 	{
 		// old code from when random templates were chosen (instead of shuffling and then iterating through)
@@ -145,15 +145,15 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				spots.push_back(Vector2{4 * TARGET_HEIGHT, 2 * TARGET_HEIGHT});
 				spots.push_back(Vector2{3 * TARGET_HEIGHT, 3 * TARGET_HEIGHT});
 				spots.push_back(Vector2{4 * TARGET_HEIGHT, 3 * TARGET_HEIGHT});
-				
+
 				// alternate constructor for stationary templates
-				templates.emplace_back(spriteRects[RECT_ONE]);
-				templates.emplace_back(spriteRects[RECT_TWO]);
-				templates.emplace_back(spriteRects[RECT_THREE]);
-				templates.emplace_back(spriteRects[RECT_FOUR]);
+				templates.emplace_back(criminalPosterRects[RECT_ONE]);
+				templates.emplace_back(criminalPosterRects[RECT_TWO]);
+				templates.emplace_back(criminalPosterRects[RECT_THREE]);
+				templates.emplace_back(criminalPosterRects[RECT_FOUR]);
 		}
 		else if (level == 2)
-		{			
+		{
 						// build a 4x4 grid in center
 				for (int i = 2; i < 6; i++)
 				{
@@ -163,10 +163,10 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 					}
 				}
 
-				templates.emplace_back(spriteRects[RECT_ONE]);
-				templates.emplace_back(spriteRects[RECT_TWO]);
-				templates.emplace_back(spriteRects[RECT_THREE]);
-				templates.emplace_back(spriteRects[RECT_FOUR]);
+				templates.emplace_back(criminalPosterRects[RECT_ONE]);
+				templates.emplace_back(criminalPosterRects[RECT_TWO]);
+				templates.emplace_back(criminalPosterRects[RECT_THREE]);
+				templates.emplace_back(criminalPosterRects[RECT_FOUR]);
 		}
 		else if (level == 3)
 		{
@@ -179,51 +179,51 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 					}
 				}
 
-				templates.emplace_back(spriteRects[RECT_ONE]);
-				templates.emplace_back(spriteRects[RECT_TWO]);
-				templates.emplace_back(spriteRects[RECT_THREE]);
-				templates.emplace_back(spriteRects[RECT_FOUR]);
+				templates.emplace_back(criminalPosterRects[RECT_ONE]);
+				templates.emplace_back(criminalPosterRects[RECT_TWO]);
+				templates.emplace_back(criminalPosterRects[RECT_THREE]);
+				templates.emplace_back(criminalPosterRects[RECT_FOUR]);
 		}
 		// levels 4, 5, 7, 8, 9, 13, 15, 17. 18, 20
 		else if (level == 4 || level == 5 || level == 7 || level == 8 || level == 9 || level == 13 || level == 15 || level == 17 || level == 18 || level == 20)
 		{
 				spots = generateSpots(4 * (12 + level));
-				
-				templates.emplace_back(spriteRects[RECT_ONE]);
-				templates.emplace_back(spriteRects[RECT_TWO]);
-				templates.emplace_back(spriteRects[RECT_THREE]);
-				templates.emplace_back(spriteRects[RECT_FOUR]);
+
+				templates.emplace_back(criminalPosterRects[RECT_ONE]);
+				templates.emplace_back(criminalPosterRects[RECT_TWO]);
+				templates.emplace_back(criminalPosterRects[RECT_THREE]);
+				templates.emplace_back(criminalPosterRects[RECT_FOUR]);
 		}
 		else if (level == 6)
 		{
 				// special stage so we will do the populate in here and then return targets
-								
+
 				// here's all the sprite choices
-				std::vector<Rectangle> rects = { spriteRects[0], spriteRects[1], spriteRects[2], spriteRects[3] };
-				
+				std::vector<Rectangle> rects = { criminalPosterRects[0], criminalPosterRects[1], criminalPosterRects[2], criminalPosterRects[3] };
+
 				// shuffle them
 				std::random_device rd;
 				std::mt19937 g(rd());
 				g.seed(std::time(0));
 				std::shuffle(rects.begin(), rects.end(), g);
-				
+
 				// pick one to be wanted
 				Rectangle wRect = rects[0];
 				rects.erase(rects.begin());
-				
+
 				Vector2 v;
-				
+
 				// now there's only 3 rects to chose from, which will be iterated over like in popWRTargets
-				
+
 				for (int i = 0; i < 8; i++)
 				{
 					for (int j = 0; j < 6; j++)
 					{
 						v = Vector2{static_cast<float>(i) * TARGET_HEIGHT, static_cast<float>(j) * TARGET_HEIGHT};
-						
+
 						//l = (i * 7) + j;
 						double angle = ((i % 2) == 0) ? PI/2 : 3*PI/2;
-						
+
 						//(Vector2, MoveAI, 	double, int, 	Rectangle)
 						//(pos, 	movetype, 	angle, 	speed, 	spriteRect)
 						// i * 7 ranges from 0 to 7 (8 cols)
@@ -233,40 +233,40 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 						targets.emplace_back(v, DIRECTION_ANGLE, angle, BASE_SPEED, rects[rand() % 3]);
 					}
 				}
-				
+
 				// choose a random index to become wanted
 				int l = (rand() % 48);
-				
+
 				std::swap(targets[l], targets[0]);
 				targets[0].setSpriteRect(wRect);
-				
+
 				return targets;
 		}
 		else if (level == 10)
 		{
 				// special stage so we will do the populate in here and then return targets
-				
+
 				// here's all the sprite choices
-				std::vector<Rectangle> rects = { spriteRects[0], spriteRects[1], spriteRects[2], spriteRects[3] };
-				
+				std::vector<Rectangle> rects = { criminalPosterRects[0], criminalPosterRects[1], criminalPosterRects[2], criminalPosterRects[3] };
+
 				// shuffle them
 				std::random_device rd;
 				std::mt19937 g(rd());
 				g.seed(std::time(0));
 				std::shuffle(rects.begin(), rects.end(), g);
-				
+
 				// pick one to be wanted
 				Rectangle wRect = rects[0];
 				rects.erase(rects.begin());
-				
+
 				Vector2 v;
-				
+
 				// now there's only 3 rects to chose from, which will be iterated over like in popWRTargets
-				
+
 				for (int i = 0; i < 8; i++)
 				{
 					v = Vector2{static_cast<float>(i) * TARGET_HEIGHT, -0.7 * TARGET_HEIGHT};
-					
+
 					//(Vector2, MoveAI, 	double, int, 	Rectangle)
 					//(pos, 	movetype, 	angle, 	speed, 	spriteRect)
 					// i * 7 ranges from 0 to 7 (8 cols)
@@ -276,50 +276,50 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 					//targets.emplace_back(v, STATIONARY, 0, 0, rects[rand() % 3]);
 					targets.emplace_back(v, rects[rand() % 3]);
 				}
-				
+
 				// choose a random index to become wanted
 				int l = (rand() % 8);
-				
+
 				std::swap(targets[l], targets[0]);
 				targets[0].setSpriteRect(wRect);
-				
+
 				return targets;
 		}
 		else if (level == 11 || level == 16)	// DIRECTION_ANGLE
 		{
 			spots = generateSpots(4 * (12 + level));
-			
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
+
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_FOUR]);
 		}
 		else if (level == 12)	// DIRECTION_SIN (up or down)
 		{
 			spots = generateSpots(4 * (12 + level));
-			
-			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_ONE]);
-			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_TWO]);
-			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_THREE]);
-			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), spriteRects[RECT_FOUR]);
+
+			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), criminalPosterRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), criminalPosterRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), criminalPosterRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_SIN, ((rand() % 2) == 0) ? PI/2 : 3*PI/2, randomSpeed(), criminalPosterRects[RECT_FOUR]);
 		}
 		else if (level == 14)	// DIRECTION_ANGLE_W_BOUNCE
 		{
 			spots = generateSpots(4 * (12 + level));
-			
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
+
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_FOUR]);
 		}
 		else if (level == 19)	// DIRECTION_SIN
 		{
 			spots = generateSpots(4 * (12 + level));
-			
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
+
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), criminalPosterRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), criminalPosterRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), criminalPosterRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), criminalPosterRects[RECT_FOUR]);
 		}
 	}
 	else if (level >= 21)
@@ -327,68 +327,68 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 		// randomly choose from: (possibilities listed in Round 21+ possibilities file)
 		int num = 96 + (rand() % 33); // [96, 128]
 		int level_type = rand() % 80; // 100
-		
+
 		if (level_type < 20)
 		{
 		// STATIONARY
 			spots = generateSpots(num);
-			
-			templates.emplace_back(spriteRects[RECT_ONE]);
-			templates.emplace_back(spriteRects[RECT_TWO]);
-			templates.emplace_back(spriteRects[RECT_THREE]);
-			templates.emplace_back(spriteRects[RECT_FOUR]);
+
+			templates.emplace_back(criminalPosterRects[RECT_ONE]);
+			templates.emplace_back(criminalPosterRects[RECT_TWO]);
+			templates.emplace_back(criminalPosterRects[RECT_THREE]);
+			templates.emplace_back(criminalPosterRects[RECT_FOUR]);
 		}
 		else if (20 <= level_type && level_type < 40)
 		{
 		// DIRECTION_ANGLE
 			spots = generateSpots(num);
-			
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
-			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
+
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_ANGLE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_FOUR]);
 		}
 		else if (40 <= level_type && level_type < 60)
 		{
 		// DIRECTION_SIN
 			spots = generateSpots(num);
-			
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
-			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
+
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), criminalPosterRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), criminalPosterRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), criminalPosterRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_SIN, randomAngle(), randomSpeed(), criminalPosterRects[RECT_FOUR]);
 		}
 		else if (60 <= level_type && level_type < 80)
 		{
 		// DIRECTION_ANGLE_W_BOUNCE
 			spots = generateSpots(num);
-			
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_ONE]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_TWO]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_THREE]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), spriteRects[RECT_FOUR]);
+
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_FOUR]);
 		}
 		/*
 		else if (80 <= level_type && level_type < 85)
 		{
-			
+
 		}
 		else if (85 <= level_type && level_type < 90)
 		{
-			
+
 		}
 		else if (90 <= level_type && level_type < 90)
 		{
-			
+
 		}
 		else if (95 <= level_type && level_type < 100)
 		{
-			
+
 		} */
 	}
-	
+
 	populateWithRandomTargets(targets, spots, templates);
-	
+
 	std::cout << "> LEVEL : " << level << std::endl;
 
 	// return the list just for fun
@@ -406,15 +406,15 @@ void DrawTarget(target t, Texture2D facesSmallTexture)
 	#else
 	// dev textures
 	Color col;
-	if (t.getSpriteRect() == spriteRects[0]) // RECT_ONE
+	if (t.getSpriteRect() == criminalPosterRects[0]) // RECT_ONE
 		col = LIME;
-	else if (t.getSpriteRect() == spriteRects[1]) // RECT_TWO
+	else if (t.getSpriteRect() == criminalPosterRects[1]) // RECT_TWO
 		col = RED;
-	else if (t.getSpriteRect() == spriteRects[2]) // RECT_THREE
+	else if (t.getSpriteRect() == criminalPosterRects[2]) // RECT_THREE
 		col = ORANGE;
-	else //if (t->getSpriteRect() == spriteRects[3]) // RECT_FOUR
+	else //if (t->getSpriteRect() == criminalPosterRects[3]) // RECT_FOUR
 		col = GOLD;
-	
+
 	DrawRectangle(t.getX(), t.getY(), 100, 100, col);
 	#endif
 }
@@ -457,8 +457,11 @@ int AlarmDuration(GAME_FLAG f)
 		case COUNTUP:
 			a *= SCORE_COUNTUP_DURATION;
 			break;
+		case LOSE_TIMER:
+			a *= LOSE_TIMER_DURATION;
+			break;
 	}
-	
+
 	return a;
 }
 

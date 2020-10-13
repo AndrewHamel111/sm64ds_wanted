@@ -36,6 +36,7 @@ bool ImageButtonSpriteSwap(Rectangle bounds, Texture2D atlas, Rectangle source, 
 	return q;
 }
 
+/// A replacement for raygui::GuiImageButtonEx (which was not very good at all).
 /// @param bounds The bounds of the button {x,y,width,height} where x,y denote the top left corner
 /// @param atlas The Texture2D sprite atlas the button image will come from.
 /// @param source The Rectangle describing the portion of the atlas containing the sprite.
@@ -64,6 +65,10 @@ bool ImageButtonEx(Rectangle bounds, Texture2D atlas, Rectangle source)
 	return q;
 }
 
+/// A simplified function only useable when buttons are associated with a BUTTON_ID
+/// @param atlas The Texture2D sprite atlas the button image will come from.
+/// @param b_id The BUTTON_ID enum value corresponding to the button.
+/// @returns True iff the button is clicked on this frame.
 bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 {
 	Rectangle bounds;

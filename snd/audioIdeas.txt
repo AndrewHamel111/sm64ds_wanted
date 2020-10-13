@@ -22,6 +22,7 @@ NICK LOSE (not the powerup)
 TITLE SCREEN
 - price is right theme
 - rocky theme
+- rick roll
 
 GAME BGM
 - nic song

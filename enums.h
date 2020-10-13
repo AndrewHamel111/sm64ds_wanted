@@ -14,11 +14,12 @@ enum MoveAI {			// description													related members		(all members use the
 
 enum SpriteRectEnum
 {
-	RECT_ONE,	// Rectangle{0,0,100,100}	
-	RECT_TWO,	// Rectangle{100,0,100,100}	
-	RECT_THREE,	// Rectangle{200,0,100,100}	
-	RECT_FOUR	// Rectangle{300,0,100,100}	
+	RECT_ONE,	// Rectangle{0,0,100,100}
+	RECT_TWO,	// Rectangle{100,0,100,100}
+	RECT_THREE,	// Rectangle{200,0,100,100}
+	RECT_FOUR	// Rectangle{300,0,100,100}
 };
+
 
 enum GAME_FLAG {
 	GAME_IN_PLAY,
@@ -26,11 +27,12 @@ enum GAME_FLAG {
 	DRUMROLL,
 	TARGET_MISSED,
 	TARGET_HIGHLIGHT,
-	ROUND_BUFFER,	
-	COUNTUP,		
-	hamSEVEN,	// not implemented
+	ROUND_BUFFER,
+	COUNTUP,
+	LOSE_TIMER,	// not implemented
 	FLAG_MUTE,
-	GAME_PAUSED		
+	GAME_PAUSED,
+  LOSE_SCREEN
 };
 
 enum BUTTON_ID {

@@ -1,7 +1,6 @@
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 
-
 //#define USE_DEV_SQUARES
 #define USE_DS_STYLE
 
@@ -31,5 +30,6 @@
 #define TARGET_HIGHLIGHT_DURATION 2
 #define ROUND_BUFFER_DURATION 2
 #define SCORE_COUNTUP_DURATION 1
+#define LOSE_TIMER_DURATION 2
 
 #endif
