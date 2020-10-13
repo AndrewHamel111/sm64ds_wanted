@@ -32,4 +32,6 @@
 #define SCORE_COUNTUP_DURATION 1
 #define LOSE_TIMER_DURATION 2
 
+#define EXAMPLE_STRING "Example String"
+
 #endif
