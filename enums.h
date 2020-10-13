@@ -29,7 +29,7 @@ enum GAME_FLAG {
 	ROUND_BUFFER,	
 	COUNTUP,		
 	hamSEVEN,	// not implemented
-	hamEIGHT,	// not implemented
+	FLAG_MUTE,
 	GAME_PAUSED		
 };
 
@@ -38,7 +38,8 @@ enum BUTTON_ID {
 	PLAY_AGAIN,
 	QUIT,
 	MUTE,
-	PAUSE
+	PAUSE,
+	PAUSE_QUIT
 };
 
 #endif

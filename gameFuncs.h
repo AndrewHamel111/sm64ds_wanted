@@ -399,7 +399,10 @@ void DrawTarget(target t, Texture2D facesSmallTexture)
 {
 	#ifndef USE_DEV_SQUARES
 	// use faces.png
-	DrawTextureRec(facesSmallTexture, t.getSpriteRect(), t.getPos(), RAYWHITE); 
+	if (t.isMenu())
+		DrawTextureRec(facesSmallTexture, t.getSpriteRect(), t.getPos(), DARKGRAY);
+	else
+		DrawTextureRec(facesSmallTexture, t.getSpriteRect(), t.getPos(), WHITE);
 	#else
 	// dev textures
 	Color col;

@@ -23,6 +23,7 @@ class target
 	MoveAI movementType;
 	Vector2 position;		/// starting position of the target / circular pivot when movementType == circular;
 	bool _isWanted;			/// determines if this particular target is the win condition on the level.
+	bool isMenuTarget;		/// targets created only for display purposes, they will wrap on screen boundaries instead of area boundaries
 
 	//float sinPeriod;
 	float sinAmplitude;
@@ -58,6 +59,7 @@ public:
 	void setPos(Vector2);
 
 	void setWanted(bool);
+	void setAsMenuTarget();
 
 	void setAngle(double);
 	void setAngleDegrees(int);
@@ -74,6 +76,7 @@ public:
 	float getY() const;
 
 	bool isWanted() const;
+	bool isMenu() const;
 	
 	Rectangle getSpriteRect() const;
 
@@ -85,14 +88,14 @@ public:
 };/*}#*/
 
 // constructor definitions for class target/*#{*/
-target::target(float x, float y, MoveAI movetype, bool wanted): sinAmplitude{BASE_SIN_AMPLITUDE}
+target::target(float x, float y, MoveAI movetype, bool wanted): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(x, y);
 	setMoveType(movetype);
 	setWanted(wanted);
 }
 
-target::target(float x, float y, MoveAI movetype,Direction direction, bool wanted): sinAmplitude{BASE_SIN_AMPLITUDE}
+target::target(float x, float y, MoveAI movetype,Direction direction, bool wanted): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(x, y);
 	setMoveType(movetype);
@@ -109,7 +112,7 @@ target::target(float x, float y, MoveAI movetype,Direction direction, bool wante
 	}
 }
 
-target::target(float x, float y, MoveAI movetype, double angle,bool wanted): sinAmplitude{BASE_SIN_AMPLITUDE}
+target::target(float x, float y, MoveAI movetype, double angle,bool wanted): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(x,y);
 	setMoveType(movetype);
@@ -120,7 +123,7 @@ target::target(float x, float y, MoveAI movetype, double angle,bool wanted): sin
 	speed = BASE_SPEED;
 }
 
-target::target(float x, float y, MoveAI movetype, double angle,float speed): sinAmplitude{BASE_SIN_AMPLITUDE}
+target::target(float x, float y, MoveAI movetype, double angle,float speed): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(x,y);
 	setMoveType(movetype);
@@ -130,7 +133,7 @@ target::target(float x, float y, MoveAI movetype, double angle,float speed): sin
 	setSpeed(speed);
 }
 
-target::target(Vector2 pos, MoveAI movetype, double angle,float speed): sinAmplitude{BASE_SIN_AMPLITUDE}
+target::target(Vector2 pos, MoveAI movetype, double angle,float speed): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(pos);
 	setMoveType(movetype);
@@ -140,7 +143,7 @@ target::target(Vector2 pos, MoveAI movetype, double angle,float speed): sinAmpli
 	setSpeed(speed);
 }
 
-target::target(Vector2 pos, MoveAI movetype, double angle,float speed, Rectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE}
+target::target(Vector2 pos, MoveAI movetype, double angle,float speed, Rectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(pos);
 	setMoveType(movetype);
@@ -151,7 +154,7 @@ target::target(Vector2 pos, MoveAI movetype, double angle,float speed, Rectangle
 	setSpriteRect(spriteRect);
 }
 
-target::target(Vector2 pos, target_template t): sinAmplitude{BASE_SIN_AMPLITUDE}
+target::target(Vector2 pos, target_template t): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(pos);
 	setMoveType(t.movetype);
@@ -163,7 +166,7 @@ target::target(Vector2 pos, target_template t): sinAmplitude{BASE_SIN_AMPLITUDE}
 	setSpriteRect(t.rect);
 }
 
-target::target(Vector2 pos, Rectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE}
+target::target(Vector2 pos, Rectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(pos);
 	
@@ -210,6 +213,11 @@ void target::setPos(Vector2 pos)
 void target::setWanted(bool wanted)
 {
 	_isWanted = wanted;
+}
+
+void target::setAsMenuTarget()
+{
+	isMenuTarget = true;
 }
 
 void target::setAngle(double angle_radians)
@@ -278,6 +286,11 @@ bool target::isWanted() const
 	return _isWanted;
 }
 
+bool target::isMenu() const
+{
+	return isMenuTarget;
+}
+
 Rectangle target::getSpriteRect() const
 {
 	return spriteRect;
@@ -315,18 +328,25 @@ void target::move(double time)
 
 void target::wrap()
 {
+	int upperW = AREA_WIDTH, upperH = AREA_HEIGHT;
+	if (isMenuTarget)
+	{
+		upperW = SCREEN_WIDTH;
+		upperH = SCREEN_HEIGHT;
+	}
+	
 	// // check edges		// 10 is used just as a safety blanky to protect from scary double rounding errors
-	if (position.x > AREA_WIDTH 	+ TARGET_HEIGHT + 10)		// off right edge
+	if (position.x > upperW 	+ TARGET_HEIGHT + 10)		// off right edge
 		position.x = 0 - TARGET_HEIGHT;
 
 	else if (position.x < 0			- TARGET_HEIGHT - 10)		// off left edge
-		position.x = AREA_WIDTH + TARGET_HEIGHT;
+		position.x = upperW + TARGET_HEIGHT;
 
-	if (position.y > AREA_HEIGHT	+ TARGET_HEIGHT + 10)		// off bottom edge
+	if (position.y > upperH + TARGET_HEIGHT + 10)		// off bottom edge
 		position.y = 0 - TARGET_HEIGHT;
 
 	else if (position.y < 0			- TARGET_HEIGHT - 10)		// off top edge
-		position.y = AREA_HEIGHT + TARGET_HEIGHT;
+		position.y = upperH + TARGET_HEIGHT;
 }
 
 void target::bounce()

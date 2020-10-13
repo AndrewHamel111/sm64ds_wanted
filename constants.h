@@ -5,7 +5,7 @@
 //#define USE_DEV_SQUARES
 #define USE_DS_STYLE
 
-#define FPS_TARGET 144
+#define FPS_TARGET 60
 #define FIRST_LEVEL 1
 
 #define SCREEN_WIDTH 800

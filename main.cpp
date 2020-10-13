@@ -54,6 +54,7 @@ Rectangle RECT_NONTENDO	 	= Rectangle{256, 206, 312, 80};
 Rectangle RECT_2020 		= Rectangle{256, 286, 112, 30};
 Rectangle RECT_UNMUTED		= Rectangle{568, 206, 80, 80};
 Rectangle RECT_MUTED		= Rectangle{648, 206, 80, 80};
+Rectangle RECT_PAUSE		= Rectangle{768, 206, 256, 76};
 
 #include "constants.h"
 #include "enums.h"
@@ -62,6 +63,40 @@ Rectangle RECT_MUTED		= Rectangle{648, 206, 80, 80};
 #include "operators.h"
 #include "const_strings.h"
 #include "gameFuncs.h"
+
+Rectangle RECT_BUTTON[] = { Rectangle{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304 - 38, 256, 76}, Rectangle{SCREEN_WIDTH/2 - 128, AREA_HEIGHT/2 - 38, 256, 76} , Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76},
+							Rectangle{SCREEN_WIDTH - 80 - 8, AREA_HEIGHT + 8, 80, 80}, Rectangle{SCREEN_WIDTH - 256 - 8, SCREEN_HEIGHT - 76 - 8, 256, 76}, Rectangle{8, SCREEN_HEIGHT - 76 - 8, 256, 76} };
+
+
+
+// Alarm variables #{
+/*										flag						constant
+alarm[0] -	EMPTY ALARM
+alarm[1] -	preRoundAlarm				|	preRoundFlag			|	PREROUND_ALARM_DURATION
+alarm[2] -	drumrollAlarm				|	drumrollFlag			|	DRUMROLL_ALARM_DURATION
+alarm[3] - 	targetMissedAlarm			|	targetMissedFlag		|	TARGET_MISSED_ALARM_DURATION
+alarm[4] -	targetHighlightAlarm		|	targetHighlightFlag		|	TARGET_HIGHLIGHT_DURATION
+alarm[5] -	roundBuffer
+alarm[6] -	scoreCountupAlarm
+alarm[7] -
+alarm[8] -
+alarm[9] -
+}#		*/
+int alarm[10] = {0};	// linked with flags by enum GAME_FLAG
+
+// flags
+// preRoundFlag = false;
+// drumrollFlag = false;		// TODO To Be Implemented
+// targetMissedFlag = false;	// TODO To Be Implemented
+// targetHighlightFlag = false;
+// roundTimeDepletedFlag = false;
+// scoreCountupFlag
+bool flags[10] = {false};// linked with alarms by enum GAME_FLAG
+
+// counter[0] - used for countup
+int counter[2] = {0};
+
+#include "button.h"
 
 int main(void)
 {
@@ -82,25 +117,43 @@ int main(void)
 
 	// 	// Game Containers
 	vector<target> allTargets;
+	vector<target> menuTargets;
 	
 	target dummyTarget = target(0,0,STATIONARY,false);
 	target selectedTarget = dummyTarget;
 
 	bool pauseFlag = false;			// TODO To Be Implemented
 
+	int secondCounter;
+	int frameCounter;
 
 	// Timer variables	TODO deprecate in favor of alarms
 	double highlightStart = 0;
 	double timeLevelStart = 0;
 
+	// Start menu targets
+	for (int i = 0; i < 4; i++)
+	{
+		Vector2 v1 = Vector2{25, (static_cast<float>(i + 1) / 4) * SCREEN_HEIGHT};
+		Vector2 v2 = Vector2{SCREEN_WIDTH - 125, SCREEN_HEIGHT - v1.y - 100};
+		
+		target t1 = target(v1, DIRECTION_ANGLE, 3*PI/2, BASE_SPEED/2, spriteRects[i]);
+		target t2 = target(v2, DIRECTION_ANGLE, PI/2, 	BASE_SPEED/2, spriteRects[i]);
+		
+		t1.setAsMenuTarget();
+		t2.setAsMenuTarget();
+		
+		menuTargets.push_back(t1);
+		menuTargets.push_back(t2);
+	}
 
 	// Start Menu UI
 	bool buttonStart 	= false;
 	bool buttonOptions 	= false;
 	bool buttonQuit 	= false;
 
-	Rectangle buttonStartRect{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304, 256, 76};
-	Rectangle buttonOptionsRect{SCREEN_WIDTH/2 - 100, 2*SCREEN_HEIGHT/4 - 75, 200, 150};
+	//Rectangle buttonStartRect{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304, 256, 76};
+	//Rectangle buttonOptionsRect{SCREEN_WIDTH/2 - 100, 2*SCREEN_HEIGHT/4 - 75, 200, 150};
 	Rectangle buttonQuitRect{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76};
 
 	const char * buttonStartLabel 	= "Start";
@@ -141,36 +194,6 @@ int main(void)
 	Sound four[] = { LoadSound("snd/four.wav"), LoadSound("snd/four2.wav"), LoadSound("snd/four3.wav")};
 	
 	Sound points = LoadSound("snd/points.wav");
-
-	// Alarm variables #{
-	/*										flag						constant
-	alarm[0] -	EMPTY ALARM
-	alarm[1] -	preRoundAlarm				|	preRoundFlag			|	PREROUND_ALARM_DURATION
-	alarm[2] -	drumrollAlarm				|	drumrollFlag			|	DRUMROLL_ALARM_DURATION
-	alarm[3] - 	targetMissedAlarm			|	targetMissedFlag		|	TARGET_MISSED_ALARM_DURATION
-	alarm[4] -	targetHighlightAlarm		|	targetHighlightFlag		|	TARGET_HIGHLIGHT_DURATION
-	alarm[5] -	roundBuffer
-	alarm[6] -	scoreCountupAlarm
-	alarm[7] -
-	alarm[8] -
-	alarm[9] -
-	}#		*/
-	int alarm[10] = {0};	// linked with flags by enum GAME_FLAG
-	
-	// flags
-	// preRoundFlag = false;
-	// drumrollFlag = false;		// TODO To Be Implemented
-	// targetMissedFlag = false;	// TODO To Be Implemented
-	// targetHighlightFlag = false;
-	// roundTimeDepletedFlag = false;
-	// scoreCountupFlag
-	bool flags[10] = {false};// linked with alarms by enum GAME_FLAG
-	
-	// counter[0] - used for countup
-	int counter[2] = {0};
-	
-	int secondCounter = 10;
-	int frameCounter = FPS_TARGET;
 
 	SetTargetFPS(FPS_TARGET);               // Set framerate
 	SetExitKey(KEY_BACKSPACE);
@@ -374,12 +397,18 @@ int main(void)
 			// START MENU #{
 			else if (level == 0)
 			{
+				updateTargets(menuTargets, GetTime());
+				
 				if (buttonStart)
 				{
 					buttonStart = false;
 
 					// initalize first level
 					level = FIRST_LEVEL;
+					
+					// start the timer
+					secondCounter = 10;
+					frameCounter = FPS_TARGET;
 					
 					flags[GAME_IN_PLAY] = false;
 					flags[ROUND_BUFFER] = true;
@@ -421,16 +450,21 @@ int main(void)
 			// DRAW MENU #{
 			if(level == 0)
 			{
-				ClearBackground(WHITE);
+				ClearBackground(BLACK);
+				DrawRectangleRec(Rectangle{150,0,SCREEN_WIDTH - 300,SCREEN_HEIGHT}, BLACK);				
+				DrawTextureRec(atlas, posterSourceRect, Vector2{AREA_WIDTH/2 - 128, AREA_HEIGHT/2 - 96 - 48}, RAYWHITE);
+				int time = static_cast<int>(GetTime()) % 12;
 				
-				//GuiSetStyle(LABEL, TEXT_ALIGNMENT, GUI_TEXT_ALIGN_CENTER);
-				// buttonStart 	= GuiButton(buttonStartRect, 	buttonStartLabel);
-				// buttonOptions 	= GuiButton(buttonOptionsRect, 	buttonOptionsLabel);
-				// buttonQuit 		= GuiButton(buttonQuitRect, 	buttonQuitLabel);
+				// time ranges from 0-19, meaning time/5 ranges from 0-3 (so it's safe to use as an index key here)
 				
-				buttonStart = GuiImageButtonEx(buttonStartRect, "", atlas, RECT_PLAY);
+				DrawTextureRec(atlas, posterRects[time/3], Vector2{AREA_WIDTH/2 - 128 + 80, AREA_HEIGHT/2 - 96 - 48 + 19}, RAYWHITE);
+									
+				for(target t : menuTargets)
+					DrawTarget(t, atlas);
+				
+				buttonStart = ImageButton(atlas, PLAY);
 				//buttonOptions = GuiImageButtonEx(buttonOptionsRect, "", uiTexture, RECT_OPTIONS);
-				buttonQuit = GuiImageButtonEx(buttonQuitRect, "", atlas, RECT_QUIT);
+				buttonQuit = ImageButton(atlas, QUIT);
 				
 			}/*}#*/
 			/* DRAW OPTIONS MENU  #{*/	
@@ -444,7 +478,26 @@ int main(void)
 				// PAUSE DRAW
 				if (pauseFlag)	// DRAW PAUSE MENU
 				{
-
+					ClearBackground(NEARBLACK);
+					DrawText("PAUSED", AREA_WIDTH/2, AREA_HEIGHT/2, 30, RAYWHITE);
+					if (ImageButton(atlas, PAUSE))
+						pauseFlag = false;
+					
+					if (ImageButtonEx(RECT_BUTTON[PAUSE_QUIT], atlas, RECT_QUIT))
+					{
+						// TODO save the high score? perhaps it will instead load
+						// the typical end screen? maybe instead we set the seconds to 0 and then
+						// simply unpause?
+						
+						level = 0;
+						pauseFlag = false;
+						for(int i = 0; i < 10; i++)
+						{
+							alarm[i] = 0;
+							flags[i] = false;
+						}
+						allTargets.clear();
+					}
 				}
 				// PREROUND DRAW
 				else if (flags[PREROUND])
@@ -466,8 +519,6 @@ int main(void)
 					DrawRectangleRec(bottomBarRect, NEARBLACK);
 					DrawTextureRec(atlas, posterSourceRect, posterPos, WHITE); 
 					DrawTextureRec(atlas, r, Vector2{posterPos.x + 80,posterPos.y + 19}, WHITE);
-					// TODO implement this whole section.
-					// play the animation of the slow reveal of the target
 				}
 				// BETWEEN ROUNDS, DRAW
 				else if (flags[ROUND_BUFFER])	// Show name of the round
@@ -482,7 +533,6 @@ int main(void)
 				// MAIN DRAW
 				else
 				{
-					// TODO change how this works probably
 					if (alarm[3] > 0)//0.5 * AlarmDuration(TARGET_MISSED))	// red background
 						ClearBackground(MAROON);
 					else if (flags[TARGET_HIGHLIGHT] || flags[COUNTUP])												// yellow
@@ -523,14 +573,20 @@ int main(void)
 					// draw time left
 					DrawTextureRec(atlas, RECT_TIME, Vector2{posterPos.x + 288, posterPos.y + 8}, WHITE);
 					DrawTimerAt(atlas, secondCounter, Vector2{posterPos.x + 320, posterPos.y + 23});
-					
-					//		secondCounter / 10 -> digit[0]
-					//    	secondCounter % 10 -> digit[1]
-					// DrawTextureRec(atlas, GetDigitRect(secondCounter / 10), Vector2{posterPos.x + 288, posterPos.y + 38}, WHITE);
-					// DrawTextureRec(atlas, GetDigitRect(secondCounter % 10), Vector2{posterPos.x + 320, posterPos.y + 38}, WHITE);					
+			
+					pauseFlag = ImageButton(atlas, PAUSE);
 				}	
 				
 			}	// }#
+			
+			if (ImageButton(atlas, MUTE))
+			{
+				flags[FLAG_MUTE] = !flags[FLAG_MUTE];
+				if (!flags[FLAG_MUTE])
+					ResumeMusicStream(bgm);
+				else
+					PauseMusicStream(bgm);
+			}
 
 		EndDrawing();
 		//----------------------------------------------------------------------------------
