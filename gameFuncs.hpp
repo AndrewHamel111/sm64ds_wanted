@@ -429,8 +429,15 @@ void tickSeconds(int& seconds, int& frames)
 	frames--;
 	if (frames <= 1)
 	{
-		seconds--;
-		frames = FPS_TARGET;
+		if (seconds <= 0)
+		{
+			frames = 0;
+		}
+		else
+		{
+			seconds--;
+			frames = FPS_TARGET;
+		}
 	}
 }
 
@@ -501,6 +508,21 @@ void DrawTimerAt(Texture2D atlas, int num, Vector2 center)
 	}
 	else
 		DrawNumberAt(atlas, num, center);
+}
+
+void ResetGameFlags(std::array<int> indices)
+{
+	for(int i : indices)
+	{
+		alarm[i] = 0;
+		flags[i] = false;
+	}
+}
+
+void ResetGameFlags()
+{
+	int indices[] = {GAME_IN_PLAY, PREROUND, DRUMROLL, TARGET_MISSED, TARGET_HIGHLIGHT, ROUND_BUFFER, COUNTUP, LOSE_TIMER, GAME_PAUSED, LOSE_SCREEN};
+	ResetGameFlags(indices);
 }
 
 #endif

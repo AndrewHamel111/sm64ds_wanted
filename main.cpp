@@ -34,6 +34,8 @@ https://www.youtube.com/watch?v=WePBtu63J_4
 #include <vector>
 #include <utility>
 
+#include "constants.hpp"
+
 // SPRITE SOURCE RECTANGLES, IMPORTANT TO CHANGE IF/WHEN SOURCE SPRITE CHANGES
 Rectangle criminalPosterRects[] = { Rectangle{76,0,100,100}, Rectangle{332,0,100,100},Rectangle{588,0,100,100},Rectangle{844,0,100,100}};
 Rectangle posterSourceRects[] = { Rectangle{76,316,100,100}, Rectangle{332,316,100,100},Rectangle{588,316,100,100},Rectangle{844,316,100,100}};
@@ -51,19 +53,6 @@ Rectangle RECT_UNMUTED		= Rectangle{568, 206, 80, 80};
 Rectangle RECT_MUTED		= Rectangle{648, 206, 80, 80};
 Rectangle RECT_PAUSE		= Rectangle{768, 206, 256, 76};
 
-#include "constants.h"
-#include "enums.h"
-#include "target.h"
-#include "utilities.h"
-#include "operators.h"
-#include "const_strings.h"
-#include "gameFuncs.h"
-
-Rectangle RECT_BUTTON[] = { Rectangle{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304 - 38, 256, 76}, Rectangle{SCREEN_WIDTH/2 - 128, AREA_HEIGHT/2 - 38, 256, 76} , Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76},
-							Rectangle{SCREEN_WIDTH - 80 - 8, AREA_HEIGHT + 8, 80, 80}, Rectangle{SCREEN_WIDTH - 256 - 8, SCREEN_HEIGHT - 76 - 8, 256, 76}, Rectangle{8, SCREEN_HEIGHT - 76 - 8, 256, 76} };
-
-
-
 // Alarm variables #{
 /*										flag						constant
 alarm[0] -	EMPTY ALARM
@@ -77,7 +66,7 @@ alarm[7] -	loseAlarm
 alarm[8] -
 alarm[9] -
 }#		*/
-int alarm[11] = {0};	// linked with flags by enum GAME_FLAG
+int alarm[ALARMFLAG_COUNT] = {0};	// linked with flags by enum GAME_FLAG
 
 // flags
 // preRoundFlag = false;
@@ -86,14 +75,23 @@ int alarm[11] = {0};	// linked with flags by enum GAME_FLAG
 // targetHighlightFlag = false;
 // roundTimeDepletedFlag = false;
 // scoreCountupFlag
-bool flags[11] = {false};// linked with alarms by enum GAME_FLAG
+bool flags[ALARMFLAG_COUNT] = {false};// linked with alarms by enum GAME_FLAG
 
 // counter[0] - used for countup
 // counter[1] - seconds left
 // counter[2] - frames left in current second
 int counter[4] = {0};
 
-#include "button.h"
+#include "enums.hpp"
+#include "target.hpp"
+#include "utilities.hpp"
+#include "operators.hpp"
+#include "gameFuncs.hpp"
+
+Rectangle RECT_BUTTON[] = { Rectangle{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304 - 38, 256, 76}, Rectangle{SCREEN_WIDTH/2 - 128, AREA_HEIGHT/2 - 38, 256, 76} , Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76},
+							Rectangle{SCREEN_WIDTH - 80 - 8, AREA_HEIGHT + 8, 80, 80}, Rectangle{SCREEN_WIDTH - 256 - 8, SCREEN_HEIGHT - 76 - 8, 256, 76}, Rectangle{8, SCREEN_HEIGHT - 76 - 8, 256, 76} };
+
+#include "button.hpp"
 
 int main(void)
 {
@@ -153,11 +151,6 @@ int main(void)
 	//Rectangle buttonOptionsRect{SCREEN_WIDTH/2 - 100, 2*SCREEN_HEIGHT/4 - 75, 200, 150};
 	Rectangle buttonQuitRect{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76};
 
-	const char * buttonStartLabel 	= "Start";
-	const char * buttonOptionsLabel = "Options";
-	const char * buttonQuitLabel 	= "Exit";
-
-
 	// Options Menu UI
 	bool buttonMenu_Options = false;
 
@@ -214,7 +207,7 @@ int main(void)
 		UpdateMusicStream(bgm);
 
 		// TICK ALARMS
-		for(int i =0; i < 10; i++)
+		for(int i =0; i < ALARMFLAG_COUNT; i++)
 		{
 			if (alarm[i] > 0) alarm[i]--;
 		}
@@ -268,18 +261,8 @@ int main(void)
 		if (flags[ROUND_BUFFER] && alarm[ROUND_BUFFER] == 0)
 		{
 			flags[ROUND_BUFFER] = false;
-
-			// initialize the next level
 			initializeLevel(allTargets, level);
 
-			// assign pre-round based on level number
-			// if (level % 5 == 1) 	// 5n + 1 levels get a drumroll
-			// {
-			// 	flags[DRUMROLL] = true;
-			// 	alarm[DRUMROLL] = AlarmDuration(DRUMROLL);
-			// }
-			// else 			// other levels get a normal buildup
-			// {
 			flags[PREROUND] = true;
 			alarm[PREROUND] = AlarmDuration(PREROUND);
 			// }
@@ -325,6 +308,23 @@ int main(void)
 		{
 
 		}
+		else if (buttonStart)
+		{
+			buttonStart = false;
+
+			// initalize first level
+			level = FIRST_LEVEL;
+
+			// start the timer
+			counter[1] = 10;
+			counter[2] = FPS_TARGET;
+
+			flags[LOSE_SCREEN] = false;
+			flags[GAME_IN_PLAY] = false;
+			flags[ROUND_BUFFER] = true;
+			alarm[ROUND_BUFFER] = AlarmDuration(ROUND_BUFFER);
+			//initializeLevel(allTargets, level);
+		}
 		else if (buttonReturnToMenu)
 		{
 			// TODO save the high score? perhaps it will instead load
@@ -350,7 +350,7 @@ int main(void)
 				{
 					updateTargets(allTargets, GetTime() - timeLevelStart);
 					tickSeconds(counter[1], counter[2]);
-					if (counter[1] <= 0 && counter[2] <= 0)
+					if (counter[1] <= 0 && counter[2] <= 1)
 					{
 						// LOSE_TIMER game
 						flags[GAME_IN_PLAY] = false;
@@ -403,6 +403,8 @@ int main(void)
 
 								if (leastDistance != EXCESSIVE_DISTANCE)
 								{
+									// remove some time
+									counter[1] -= 10;
 									flags[TARGET_MISSED] = true;
 									alarm[TARGET_MISSED] = AlarmDuration(TARGET_MISSED);
 								}
@@ -423,23 +425,7 @@ int main(void)
 			{
 				updateTargets(menuTargets, GetTime());
 
-				if (buttonStart)
-				{
-					buttonStart = false;
-
-					// initalize first level
-					level = FIRST_LEVEL;
-
-					// start the timer
-					counter[1] = 10;
-					counter[2] = FPS_TARGET;
-
-					flags[GAME_IN_PLAY] = false;
-					flags[ROUND_BUFFER] = true;
-					alarm[ROUND_BUFFER] = AlarmDuration(ROUND_BUFFER);
-					//initializeLevel(allTargets, level);
-				}
-				else if (buttonOptions)
+				if (buttonOptions)
 				{
 					buttonOptions = false;
 
@@ -515,11 +501,9 @@ int main(void)
 
 						level = 0;
 						pauseFlag = false;
-						for(int i = 0; i < 10; i++)
-						{
-							alarm[i] = 0;
-							flags[i] = false;
-						}
+						// reset any game state flags and alarms
+						ResetGameFlags();
+
 						allTargets.clear();
 					}
 				}
@@ -609,12 +593,13 @@ int main(void)
 
 			}	// }#
 
+			// MUTE button is always drawn on top
 			if (ImageButton(atlas, MUTE))
 			{
 				flags[FLAG_MUTE] = !flags[FLAG_MUTE];
-				if (!flags[FLAG_MUTE])
+				if (!flags[FLAG_MUTE] && !IsMusicPlaying(bgm))
 					ResumeMusicStream(bgm);
-				else
+				else if (flags[FLAG_MUTE] && IsMusicPlaying(bgm))
 					PauseMusicStream(bgm);
 			}
 

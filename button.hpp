@@ -15,24 +15,24 @@ bool ImageButtonSpriteSwap(Rectangle bounds, Texture2D atlas, Rectangle source, 
 	Vector2 m = Vector2{GetMouseX(), GetMouseY()};
 	Color c = WHITE;
 	bool q = false;
-	
+
 	Rectangle src = source;
-	
+
 	if (m < bounds)
 	{
 		// change atlas source for button
 		src = altSource;
-		
+
 		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
 		{
 			c = DARKBLUE;
 			q = true;
 		}
-	}		
-	
+	}
+
 	// draw the button
 	DrawTextureRec(atlas, src, Vector2{bounds.x,bounds.y}, c);
-	
+
 	return q;
 }
 
@@ -46,22 +46,22 @@ bool ImageButtonEx(Rectangle bounds, Texture2D atlas, Rectangle source)
 	Vector2 m = Vector2{GetMouseX(), GetMouseY()};
 	Color c = WHITE;
 	bool q = false;
-	
+
 	if (m < bounds)
 	{
 		// change render color of button
 		c = SKYBLUE;
-		
+
 		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
 		{
 			c = DARKBLUE;
 			q = true;
 		}
-	}		
-	
+	}
+
 	// draw the button
 	DrawTextureRec(atlas, source, Vector2{bounds.x,bounds.y}, c);
-	
+
 	return q;
 }
 
@@ -73,7 +73,7 @@ bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 {
 	Rectangle bounds;
 	Rectangle src;
-	
+
 	if (b_id == PLAY)
 	{
 		bounds = RECT_BUTTON[PLAY];
@@ -95,14 +95,13 @@ bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 			return ImageButtonSpriteSwap(RECT_BUTTON[MUTE], atlas, RECT_MUTED, RECT_UNMUTED);
 		else
 			return ImageButtonSpriteSwap(RECT_BUTTON[MUTE], atlas, RECT_UNMUTED, RECT_MUTED);
-			
 	}
 	else if (b_id == PAUSE)
 	{
 		bounds = RECT_BUTTON[PAUSE];
 		src = RECT_PAUSE;
 	}
-	
+
 	return ImageButtonEx(bounds, atlas, src);
 }
 #endif
