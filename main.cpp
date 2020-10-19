@@ -53,8 +53,13 @@ Rectangle RECT_UNMUTED		= Rectangle{568, 206, 80, 80};
 Rectangle RECT_MUTED		= Rectangle{648, 206, 80, 80};
 Rectangle RECT_PAUSE		= Rectangle{768, 206, 256, 76};
 
+/// NOT YET IMPLEMENTED
 Rectangle RECT_STAR			= Rectangle{770, 100, 30, 30};
 Rectangle RECT_TIMES		= Rectangle{770 + 30, 100, 30, 30};
+Rectangle RECT_HIGHSCORE= Rectangle{830, 			100, 133, 15};
+Rectangle RECT_SCORE		= Rectangle{830 + 63, 100, 70, 15};
+
+Rectangle RECT_POG_MINI = Rectangle{963, 100, 24, 30};
 
 // Alarm variables #{
 /*										flag						constant
@@ -94,36 +99,38 @@ unsigned short int scores[5] = {0};
 #include "gameFuncs.hpp"
 
 Rectangle RECT_BUTTON[] = { Rectangle{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304 - 38, 256, 76}, Rectangle{SCREEN_WIDTH/2 - 128, AREA_HEIGHT/2 - 38, 256, 76} , Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76},
-							Rectangle{SCREEN_WIDTH - 80 - 8, AREA_HEIGHT + 8, 80, 80}, Rectangle{SCREEN_WIDTH - 256 - 8, SCREEN_HEIGHT - 76 - 8, 256, 76}, Rectangle{8, SCREEN_HEIGHT - 76 - 8, 256, 76} };
+							Rectangle{SCREEN_WIDTH - 80 - 8, AREA_HEIGHT + 8, 80, 80}, Rectangle{SCREEN_WIDTH - 256 - 8, SCREEN_HEIGHT - 76 - 8, 256, 76}, Rectangle{8, SCREEN_HEIGHT - 76 - 8, 256, 76},
+						 Rectangle{8 + 16, AREA_HEIGHT + 8, 50, 80} };
 
 //unsigned short int scores[5] = {1, 2, 3 ,32767, 32768};
 
 #include "button.hpp"
 #include "files.hpp"
 
+// easter egg crap
+bool keys1[9] = {false};
+bool keys2[7] = {false};
+
 int main(void)
 {
 	using namespace std;
-	// Save();
-	//Load();
 
-	LoadScores();
-
-	//SaveStorageValue(0, 200);
-	//std::cout << LoadStorageValue(0) << std::endl;
 
 	// Initialization
 	//--------------------------------------------------------------------------------------
 
+	LoadScores(scores);
+	SortScores(scores);
+
 	std::srand(std::time(0));
 
-	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "WANTED!");
+	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "THE MANY FACES OF NICKTOBER! (NICK GAME NICK)");
 	InitAudioDevice();
 
 	// Window Settings
 
 	// Game Initialization
-	int level = 0; // 0 is menu, -1 is settings
+	unsigned short int level = 0; // 0 is menu, 1+ are actual levels
 
 	// 	// Game Containers
 	vector<target> allTargets;
@@ -188,23 +195,37 @@ int main(void)
 
 
 	// Audio stuff
-	Music bgm = LoadMusicStream("snd/bgm.ogg");
+	Music bgm[] = { LoadMusicStream("snd/bgm-01.ogg"), LoadMusicStream("snd/bgm-02.ogg"), LoadMusicStream("snd/bgm-03.ogg"), LoadMusicStream("snd/bgm-04.ogg"), LoadMusicStream("snd/bgm-05.ogg"), LoadMusicStream("snd/bgm-06.ogg"), LoadMusicStream("snd/bgm-07.ogg") };
+	float bgm_length[BGM_TRACK_COUNT];
 
-	Sound one[] = { LoadSound("snd/one.wav")};
-	Sound two[] = { LoadSound("snd/two.wav"), LoadSound("snd/two2.wav"), LoadSound("snd/two3.wav"), LoadSound("snd/two4.wav")};
-	Sound three[] = { LoadSound("snd/three.wav"), LoadSound("snd/three2.wav")};
-	Sound four[] = { LoadSound("snd/four.wav"), LoadSound("snd/four2.wav"), LoadSound("snd/four3.wav")};
+	int currentSongIndex = rand() % BGM_TRACK_COUNT;
 
-	Sound points = LoadSound("snd/points.wav");
+	for(int i = 0; i < BGM_TRACK_COUNT; i++)
+	{
+		SetMusicLoopCount(bgm[i], 1);
+
+		bgm_length[i] = GetMusicTimeLength(bgm[i]);
+	}
+
+	Sound one[] = { LoadSound("snd/one1.ogg"),  LoadSound("snd/one2.ogg"),  LoadSound("snd/one3.ogg")};
+	Sound two[] = { LoadSound("snd/two1.ogg"), LoadSound("snd/two2.ogg")};
+	Sound three[] = { LoadSound("snd/three1.ogg"), LoadSound("snd/three2.ogg")};
+	Sound four[] = { LoadSound("snd/four1.ogg"), LoadSound("snd/four2.ogg"), LoadSound("snd/four3.ogg"), LoadSound("snd/four4.ogg")};
+
+	Sound points[] = { LoadSound("snd/points-01.ogg"), LoadSound("snd/points-02.ogg"), LoadSound("snd/points-03.ogg"), LoadSound("snd/points-04.ogg") };
+	Sound miss[] = { LoadSound("snd/miss1.ogg"), LoadSound("snd/miss2.ogg"), LoadSound("snd/miss3.ogg")};
+	Sound end[] = { LoadSound("snd/end1.ogg"), LoadSound("snd/end2.ogg")};
+
+	Sound currentSound;
 
 	SetTargetFPS(FPS_TARGET);               // Set framerate
 	SetExitKey(KEY_BACKSPACE);
-	//SetTextureWrap(atlas, WRAP_MIRROR_CLAMP);
 
-	//PlaySound(bgm);
-	PlayMusicStream(bgm);
+	PlayMusicStream(bgm[currentSongIndex]);
 
 	//--------------------------------------------------------------------------------------
+
+	bool TESTFLAG = true;
 
 	// Main game loop
 	while (!WindowShouldClose() && !buttonQuit)    // Detect window close button or ESC key#{
@@ -214,9 +235,19 @@ int main(void)
 
 		if (flags[GAME_PAUSED]) continue;
 
+		// each song has 5 seconds of silence at the end as a buffer
+		if(GetMusicTimePlayed(bgm[currentSongIndex]) >= (bgm_length[currentSongIndex] - 5.0f))
+		{
+			StopMusicStream(bgm[currentSongIndex]);
 
-		//if (!IsSoundPlaying(bgm))	PlaySound(bgm);
-		UpdateMusicStream(bgm);
+			currentSongIndex++;
+			if (currentSongIndex == BGM_TRACK_COUNT) currentSongIndex = 0;
+
+			PlayMusicStream(bgm[currentSongIndex]);
+		}
+		else
+			UpdateMusicStream(bgm[currentSongIndex]);
+
 
 		// TICK ALARMS
 		if (!pauseFlag)
@@ -254,7 +285,8 @@ int main(void)
 			// reset frame counter, initialize score count up
 			counter[2] = FPS_TARGET;
 
-			PlaySound(points);
+			currentSound = points[rand() % POINTS_SFX_COUNT];
+			PlaySound(currentSound);
 
 			alarm[COUNTUP] = AlarmDuration(COUNTUP);
 			flags[COUNTUP] = true;
@@ -282,7 +314,7 @@ int main(void)
 		}	// }#
 		if (flags[LOSE_TIMER] && alarm[LOSE_TIMER] == 0)
 		{
-			UpdateScores(level);
+			UpdateScores(scores, level - 1);
 			for(int i = 0; i < 5; i++)
 			{
 				std::cout << scores[i] << " ";
@@ -290,6 +322,9 @@ int main(void)
 			std::cout << std::endl;
 
 			flags[LOSE_TIMER] = false;
+
+			currentSound = end[rand() % 2];
+			PlaySound(currentSound);
 			flags[LOSE_SCREEN] = true;
 		}	// }#
 
@@ -341,10 +376,6 @@ int main(void)
 		}
 		else if (buttonReturnToMenu)
 		{
-			// TODO save the high score? perhaps it will instead load
-			// the typical end screen? maybe instead we set the seconds to 0 and then
-			// simply unpause?
-
 			buttonReturnToMenu = false;
 
 			level = 0;
@@ -370,6 +401,10 @@ int main(void)
 					if (counter[1] == 0 && counter[2] <= 1)
 					{
 						// LOSE_TIMER game
+
+						currentSound = miss[rand() % 3];
+						PlaySound(currentSound);
+
 						flags[GAME_IN_PLAY] = false;
 						flags[LOSE_TIMER] = true;
 						alarm[LOSE_TIMER] = AlarmDuration(LOSE_TIMER);
@@ -377,10 +412,7 @@ int main(void)
 
 					if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
 					{
-
-						float mx = static_cast<float>(GetMouseX());
-						float my = static_cast<float>(GetMouseY());
-						Vector2 mPos{mx,my};
+						Vector2 mPos{static_cast<float>(GetMouseX()),static_cast<float>(GetMouseY())};
 
 						if (!(mPos.x > AREA_WIDTH || mPos.y > AREA_HEIGHT || mPos.x < 0 || mPos.y < 0))
 						{
@@ -388,18 +420,79 @@ int main(void)
 							{
 								// START HIGHLIGHT ALARM
 								flags[TARGET_HIGHLIGHT] = true;
-								alarm[TARGET_HIGHLIGHT] = AlarmDuration(TARGET_HIGHLIGHT);
+
+								// assign an alarm duration corresponding to the sound effect duration
+								//alarm[TARGET_HIGHLIGHT] = AlarmDuration(TARGET_HIGHLIGHT);
 
 								flags[GAME_IN_PLAY] = false;
 
+								int i;
+								float j;
 								if (allTargets[0].getSpriteRect() == criminalPosterRects[RECT_ONE])
-									PlaySound(one[0]);
+								{
+									i = rand() % 3;
+									switch(i)
+									{
+										case 0: // 3
+											j = 2.814f;
+											break;
+										case 1: // 3
+											j = 2.947f;
+											break;
+										case 2: // 3.5
+											j = 3.490f;
+									}
+									currentSound = one[i];
+								}
 								else if (allTargets[0].getSpriteRect() == criminalPosterRects[RECT_TWO])
-									PlaySound(two[rand() % 4]);
+								{
+									i = rand() % 2;
+									switch(i)
+									{
+										case 0:
+											j = 1.945f;
+											break;
+										case 1:
+											j = 1.972f;
+									}
+									currentSound = two[i];
+								}
 								else if (allTargets[0].getSpriteRect() == criminalPosterRects[RECT_THREE])
-									PlaySound(three[rand() % 2]);
+								{
+									i = rand() % 2;
+									switch(i)
+									{
+										case 0:
+											j = 3.43f;
+											break;
+										case 1:
+											j = 2.731f;
+									}
+									currentSound = three[i];
+								}
 								else
-									PlaySound(four[rand() % 3]);
+								{
+									i = rand() % 4;
+									switch(i)
+									{
+										case 0:
+											j = 0.512f;
+											break;
+										case 1:
+											j = 0.544f;
+											break;
+										case 2:
+											j = 2.77f;
+											break;
+										case 3:
+											j = 2.16f;
+									}
+									currentSound = four[i];
+								}
+
+								alarm[TARGET_HIGHLIGHT] = static_cast<int>(j * FPS_TARGET);
+								std::cout << "alarm: " << alarm[TARGET_HIGHLIGHT] << std::endl;
+								PlaySoundMulti(currentSound);
 							}
 							else	// MISSED TARGET
 							{
@@ -409,20 +502,26 @@ int main(void)
 								int leastDistance = EXCESSIVE_DISTANCE;	// a number certainly larger than the dimensions of the window
 								int d;
 
+								// calculate square distances
 								for(; iter != iEnd; iter++)
 								{
 									// skip element if it's outside of the click range or isn't actually a smaller distance
-									if ((d = hamelDistance(iter->getCenter(), mx, my)) > CLICK_RANGE || d > leastDistance) continue;
+									if ((d = hamelDistance(iter->getCenter(), mPos.x, mPos.y)) > CLICK_RANGE || d > leastDistance) continue;
 
 									leastDistance = d;
 									highlightTextOrigin = iter->getCenter();
 									selectedTarget = *iter;
 								}
 
+								// if there was an invalid target in click range, deduct time and start the TARGET_MISSED alarm
 								if (leastDistance != EXCESSIVE_DISTANCE)
 								{
 									// remove some time
 									counter[1] = (counter[1] < 10) ? (counter[2] = 0) : counter[1] - 10;
+
+									currentSound = miss[rand() % 3];
+									PlaySound(currentSound);
+
 									flags[TARGET_MISSED] = true;
 									alarm[TARGET_MISSED] = AlarmDuration(TARGET_MISSED);
 								}
@@ -487,21 +586,28 @@ int main(void)
 				if (pauseFlag)	// DRAW PAUSE MENU
 				{
 					ClearBackground(NEARBLACK);
-					DrawText("PAUSED", AREA_WIDTH/2, AREA_HEIGHT/2, 30, RAYWHITE);
+					DrawText("PAUSED", AREA_WIDTH/2 - 100, AREA_HEIGHT/2, 30, RAYWHITE);
 					if (ImageButton(atlas, PAUSE))
 						pauseFlag = false;
 
 					if (ImageButtonEx(RECT_BUTTON[PAUSE_QUIT], atlas, RECT_QUIT))
 					{
-						// TODO save the high score? perhaps it will instead load
-						// the typical end screen? maybe instead we set the seconds to 0 and then
-						// simply unpause?
+						UpdateScores(scores, level - 1);
+						for(int i = 0; i < 5; i++)
+						{
+							std::cout << scores[i] << " ";
+						}
+						std::cout << std::endl;
 
-						//level = 0;
 						pauseFlag = false;
+
 						// reset any game state flags and alarms
 						ResetGameFlags();
 						counter[1] = counter[2] = 0;
+
+						currentSound = end[rand() % 2];
+						PlaySound(currentSound);
+
 						flags[LOSE_SCREEN] = true;
 
 						allTargets.clear();
@@ -511,8 +617,31 @@ int main(void)
 				else if (flags[LOSE_SCREEN])
 				{
 					ClearBackground(NEARBLACK);
+					int myScore = level - 1;
+					bool _p = true;
 
+					// HIGH SCORE text
+					DrawTextureRec(atlas, RECT_HIGHSCORE, Vector2{AREA_WIDTH/2 - 72, 50}, WHITE);
 
+					for(int i = 0; i < 5; i++)
+					{
+						// draw stars & the times symbol
+						DrawTextureRec(atlas, RECT_STAR,  Vector2{AREA_WIDTH/2 - 75, (2*i + 3)*(SCREEN_HEIGHT - 228)/15 + 15}, WHITE);
+						DrawTextureRec(atlas, RECT_TIMES, Vector2{AREA_WIDTH/2 - 45,  (2*i + 3)*(SCREEN_HEIGHT - 228)/15 + 15}, WHITE);
+
+						// draw the scores using DrawNumberAt
+						DrawNumberAtLeftJustified(atlas, scores[i], Vector2{AREA_WIDTH/2, (2*i + 3)*(SCREEN_HEIGHT - 228)/15});
+
+						if (_p && myScore == scores[i])
+						{
+							_p = false;
+							int xOff = 20;
+							if (myScore > 999) xOff += 30;
+							if (myScore > 99) xOff += 30;
+							if (myScore > 9) xOff += 30;
+							DrawTextureRec(atlas, RECT_POG_MINI, Vector2{AREA_WIDTH/2 + xOff, (2*i + 3)*(SCREEN_HEIGHT - 228)/15 + 15}, WHITE);
+						}
+					}
 
 					buttonStart = ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*3, 256, 76}, atlas, RECT_PLAY_AGAIN);
 					buttonReturnToMenu = ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*2, 256, 76}, atlas, RECT_QUIT);
@@ -589,6 +718,10 @@ int main(void)
 					DrawTextureRec(atlas, posterSourceRect, posterPos, WHITE);
 					DrawTextureRec(atlas, r, Vector2{posterPos.x + 80,posterPos.y + 19}, WHITE);
 
+					// draw current score
+					DrawTextureRec(atlas, RECT_SCORE, Vector2{posterPos.x - 32 - 70, posterPos.y + 8}, WHITE);
+					DrawNumberAt(atlas, level - 1, Vector2{posterPos.x - 32 - 35, posterPos.y + 23});
+
 					// draw time left
 					DrawTextureRec(atlas, RECT_TIME, Vector2{posterPos.x + 288, posterPos.y + 8}, WHITE);
 					DrawTimerAt(atlas, counter[1], Vector2{posterPos.x + 320, posterPos.y + 23});
@@ -606,10 +739,23 @@ int main(void)
 			if (ImageButton(atlas, MUTE))
 			{
 				flags[FLAG_MUTE] = !flags[FLAG_MUTE];
-				if (!flags[FLAG_MUTE] && !IsMusicPlaying(bgm))
-					ResumeMusicStream(bgm);
-				else if (flags[FLAG_MUTE] && IsMusicPlaying(bgm))
-					PauseMusicStream(bgm);
+				if (!flags[FLAG_MUTE] && !IsMusicPlaying(bgm[currentSongIndex]))
+					ResumeMusicStream(bgm[currentSongIndex]);
+				else if (flags[FLAG_MUTE] && IsMusicPlaying(bgm[currentSongIndex]))
+					PauseMusicStream(bgm[currentSongIndex]);
+			}
+
+			if (ImageButton(atlas, SKIP))
+			{
+				StopMusicStream(bgm[currentSongIndex]);
+
+				currentSongIndex++;
+				if (currentSongIndex == BGM_TRACK_COUNT) currentSongIndex = 0;
+
+				PlayMusicStream(bgm[currentSongIndex]);
+
+				if (flags[FLAG_MUTE])
+					PauseMusicStream(bgm[currentSongIndex]);
 			}
 
 		EndDrawing();
@@ -621,6 +767,8 @@ int main(void)
 	CloseAudioDevice();
 	CloseWindow();        // Close window and OpenGL context
 	//--------------------------------------------------------------------------------------
+
+	SaveScores(scores);
 
 	return 0;
 }

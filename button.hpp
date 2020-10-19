@@ -101,6 +101,32 @@ bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 		bounds = RECT_BUTTON[PAUSE];
 		src = RECT_PAUSE;
 	}
+	else if (b_id == SKIP)
+	{
+		bounds = RECT_BUTTON[SKIP];
+		Color c = LIME;
+		bool q = false, p = false;
+
+		if (p = (Vector2{GetMouseX(), GetMouseY()} < bounds))
+		{
+			// change render color of button
+			c = WHITE;
+			q = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+		}
+
+		// draw the button
+		DrawTextureRec(atlas, RECT_UNMUTED, Vector2{bounds.x,bounds.y}, c);
+		if (p)
+		{
+			DrawText("SKIP", bounds.x + 11, bounds.y + 30, 8, RAYWHITE);
+			DrawText("SONG", bounds.x + 9, bounds.y + 38, 8, RAYWHITE);
+		}
+		return q;
+	}
+	else
+	{
+		// do nothing
+	}
 
 	return ImageButtonEx(bounds, atlas, src);
 }

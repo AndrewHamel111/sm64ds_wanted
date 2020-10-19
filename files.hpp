@@ -19,7 +19,7 @@ void Load()
 	char fileName[] = "wanted_savedata";
 	unsigned int bytesRead;
 	unsigned char * data = LoadFileData(fileName, &bytesRead);
-	
+
 	unsigned short a,b;
 	for (int i = 0; i < 5; i++)
 	{
@@ -34,7 +34,7 @@ void Load()
 }
 */
 
-void SaveScores()
+void SaveScores(unsigned short int* scores)
 {
 	SaveStorageValue(HI_SCORE, scores[0]);
 	SaveStorageValue(HI_SCORE2, scores[1]);
@@ -43,7 +43,7 @@ void SaveScores()
 	SaveStorageValue(HI_SCORE5, scores[4]);
 }
 
-void LoadScores()
+void LoadScores(unsigned short int* scores)
 {
 	scores[0] = LoadStorageValue(HI_SCORE);
 	scores[1] = LoadStorageValue(HI_SCORE2);

@@ -479,21 +479,52 @@ void DrawNumberAt(Texture2D atlas, int num, Vector2 center)
 	}
 	else if (num < 100)
 	{
-		DrawTextureRec(atlas, GetDigitRect(num / 10), Vector2{center.x - 31, center.y + 15}, WHITE);
-		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 1, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num / 10), Vector2{center.x - 30, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x, center.y + 15}, WHITE);
 	}
 	else if (num < 1000)
 	{
-		DrawTextureRec(atlas, GetDigitRect(num / 100), Vector2{center.x - 47, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num / 100), Vector2{center.x - 45, center.y + 15}, WHITE);
 		DrawTextureRec(atlas, GetDigitRect((num / 10) % 10), Vector2{center.x - 15, center.y + 15}, WHITE);
-		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 17, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 15, center.y + 15}, WHITE);
 	}
 	else if (num < 10000)
 	{
-		DrawTextureRec(atlas, GetDigitRect(num / 1000), Vector2{center.x - 63, center.y + 15}, WHITE);
-		DrawTextureRec(atlas, GetDigitRect((num / 100) % 10), Vector2{center.x - 31, center.y + 15}, WHITE);
-		DrawTextureRec(atlas, GetDigitRect((num / 10) % 10), Vector2{center.x + 1, center.y + 15}, WHITE);
-		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 33, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num / 1000), Vector2{center.x - 60, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect((num / 100) % 10), Vector2{center.x - 30, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect((num / 10) % 10), Vector2{center.x, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 30, center.y + 15}, WHITE);
+	}
+}
+
+/**
+* @param atlas the sprite atlas the font will be collected from.
+* @param num the number represented by the digits drawn
+* @param center the center of the left-most digit
+*/
+void DrawNumberAtLeftJustified(Texture2D atlas, int num, Vector2 center)
+{
+	if (num < 10)
+	{
+		DrawTextureRec(atlas, GetDigitRect(num), Vector2{center.x - 15, center.y + 15}, WHITE);
+	}
+	else if (num < 100)
+	{
+		DrawTextureRec(atlas, GetDigitRect(num / 10), Vector2{center.x - 15, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 15, center.y + 15}, WHITE);
+	}
+	else if (num < 1000)
+	{
+		DrawTextureRec(atlas, GetDigitRect(num / 100), Vector2{center.x - 15, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect((num / 10) % 10), Vector2{center.x + 15, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 45, center.y + 15}, WHITE);
+	}
+	else if (num < 10000)
+	{
+		DrawTextureRec(atlas, GetDigitRect(num / 1000), Vector2{center.x - 15, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect((num / 100) % 10), Vector2{center.x + 15, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect((num / 10) % 10), Vector2{center.x + 45, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 60, center.y + 15}, WHITE);
 	}
 }
 
@@ -528,19 +559,150 @@ void ResetGameFlags()
 	}
 }
 
-void UpdateScores(int score)
+/**
+* @brief selection sort for an array of 5 ints
+* @param array pointer to an array of 5 ints
+* @return true when it's successfully sorted (tautology)
+*/
+bool SortScores(unsigned short int* array)
 {
-	std::vector<int> v{6};
+	// array will always have 5 elements
+	int max;
+	int maxIndex;
+
 	for(int i = 0; i < 5; i++)
-		v[i] = scores[i];
-	
-	v[5] = score;
-	
-	// sorts using <, so v[5] > v[4] > v[3] > v[2] > v[1] > v[0]
-	// v[0] is excluded since we are only concerned with the top 5
-	std::sort(v.begin(), v.end());
+	{
+		max = array[i];
+		maxIndex = i;
+
+		// find the max between i and end of array
+		for(int j = i + 1; j < 5; j++)
+		{
+			if (array[j] > max)
+			{
+				max = array[j];
+				maxIndex = j;
+			}
+		}
+
+		// swap max to i
+		int temp = array[i];
+		array[i] = array[maxIndex];
+		array[maxIndex] = temp;
+	}
+
+	return (array[5] >= array[4] && array[4] >= array[3] && array[3] >= array[2] && array[2] >= array[1] && array[1] >= array[0]);
+}
+
+bool UpdateScores(unsigned short int* scores, unsigned short int score)
+{
 	for(int i = 0; i < 5; i++)
-		scores[i] = v[5 - i];
+	{
+		if (score > scores[i])
+		{
+			for(int j = 4; j > i; j--)
+			{
+				scores[j] = scores[j - 1];
+			}
+			scores[i] = score;
+
+			// score made it into the high score table
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void EggUpdate(bool* arr, int num)
+{
+	if (num == 1)
+	{
+		if (IsKeyPressed(KEY_N))
+			arr[0] = true;
+		else if (IsKeyPressed(KEY_I))
+			arr[1] = true;
+		else if (IsKeyPressed(KEY_C))
+			arr[2] = true;
+		else if (IsKeyPressed(KEY_K))
+			arr[3] = true;
+		else if (IsKeyPressed(KEY_T))
+			arr[4] = true;
+		else if (IsKeyPressed(KEY_O))
+			arr[5] = true;
+		else if (IsKeyPressed(KEY_B))
+			arr[6] = true;
+		else if (IsKeyPressed(KEY_E))
+			arr[7] = true;
+		else if (IsKeyPressed(KEY_R))
+			arr[8] = true;
+	}
+	else if (num == 2)
+	{
+		if (IsKeyPressed(KEY_P))
+			arr[0] = true;
+		else if (IsKeyPressed(KEY_O))
+			arr[1] = true;
+		else if (IsKeyPressed(KEY_G) && !arr[2])
+			arr[2] = true;
+		else if (IsKeyPressed(KEY_G) && arr[2])
+			arr[3] = true;
+		else if (IsKeyPressed(KEY_E))
+			arr[4] = true;
+		else if (IsKeyPressed(KEY_R))
+			arr[5] = true;
+		else if (IsKeyPressed(KEY_S))
+			arr[6] = true;
+	}
+	else if (num == 3)
+	{
+		if (IsKeyPressed(KEY_F))
+			arr[0] = true;
+		else if (IsKeyPressed(KEY_U))
+			arr[1] = true;
+		else if (IsKeyPressed(KEY_C))
+			arr[2] = true;
+		else if (IsKeyPressed(KEY_K))
+			arr[3] = true;
+		else if (IsKeyPressed(KEY_Y))
+			arr[4] = true;
+		else if (IsKeyPressed(KEY_O))
+			arr[5] = true;
+		else if (IsKeyPressed(KEY_U) && arr[1])
+			arr[6] = true;
+		else if (IsKeyPressed(KEY_S))
+			arr[7] = true;
+		else if (IsKeyPressed(KEY_I))
+			arr[8] = true;
+		else if (IsKeyPressed(KEY_M))
+			arr[9] = true;
+		else if (IsKeyPressed(KEY_O) && arr[5])
+			arr[10] = true;
+		else if (IsKeyPressed(KEY_N))
+			arr[11] = true;
+	}
+}
+
+bool EggCheck(bool* arr, int num)
+{
+	bool a = true;
+
+	if (num == 1)
+	{
+		for(int i = 0; i < 9; i++)
+			a &= arr[i];
+
+		return a;
+	}
+	else if (num == 2)
+	{
+		for(int i = 0; i < 7; i++)
+			a &= arr[i];
+
+		return a;
+	}
+
+	return false;
 }
 
 #endif
