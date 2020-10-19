@@ -15,10 +15,9 @@ https://www.youtube.com/watch?v=WePBtu63J_4
 - use an enum to reference alarms/flags to assist development
 
 	NEXT STEPS
-- implement a frames variable and a seconds variable that track time.
-	right answers are extra extra seconds, and at the end of each level the frames counter resets
-	(so we're always round up for the player)
 - form a distinction (by var name) between SourceRects and DestRects. i.e. RECT_TIME -> SOURCE_RECT_TIME
+
+- build the high scores table
 
 ********************************************************************************************/
 
@@ -30,6 +29,7 @@ https://www.youtube.com/watch?v=WePBtu63J_4
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <vector>
 #include <utility>
@@ -52,6 +52,9 @@ Rectangle RECT_2020 		= Rectangle{256, 286, 112, 30};
 Rectangle RECT_UNMUTED		= Rectangle{568, 206, 80, 80};
 Rectangle RECT_MUTED		= Rectangle{648, 206, 80, 80};
 Rectangle RECT_PAUSE		= Rectangle{768, 206, 256, 76};
+
+Rectangle RECT_STAR			= Rectangle{770, 100, 30, 30};
+Rectangle RECT_TIMES		= Rectangle{770 + 30, 100, 30, 30};
 
 // Alarm variables #{
 /*										flag						constant
@@ -82,6 +85,8 @@ bool flags[ALARMFLAG_COUNT] = {false};// linked with alarms by enum GAME_FLAG
 // counter[2] - frames left in current second
 int counter[4] = {0};
 
+unsigned short int scores[5] = {0};
+
 #include "enums.hpp"
 #include "target.hpp"
 #include "utilities.hpp"
@@ -91,11 +96,21 @@ int counter[4] = {0};
 Rectangle RECT_BUTTON[] = { Rectangle{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304 - 38, 256, 76}, Rectangle{SCREEN_WIDTH/2 - 128, AREA_HEIGHT/2 - 38, 256, 76} , Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76},
 							Rectangle{SCREEN_WIDTH - 80 - 8, AREA_HEIGHT + 8, 80, 80}, Rectangle{SCREEN_WIDTH - 256 - 8, SCREEN_HEIGHT - 76 - 8, 256, 76}, Rectangle{8, SCREEN_HEIGHT - 76 - 8, 256, 76} };
 
+//unsigned short int scores[5] = {1, 2, 3 ,32767, 32768};
+
 #include "button.hpp"
+#include "files.hpp"
 
 int main(void)
 {
 	using namespace std;
+	// Save();
+	//Load();
+
+	LoadScores();
+
+	//SaveStorageValue(0, 200);
+	//std::cout << LoadStorageValue(0) << std::endl;
 
 	// Initialization
 	//--------------------------------------------------------------------------------------
@@ -114,8 +129,11 @@ int main(void)
 	vector<target> allTargets;
 	vector<target> menuTargets;
 
+	//probably both to be deprecated
 	target dummyTarget = target(0,0,STATIONARY,false);
 	target selectedTarget = dummyTarget;
+
+	Vector2 highlightTextOrigin;
 
 	bool pauseFlag = false;			// TODO To Be Implemented
 
@@ -141,20 +159,13 @@ int main(void)
 
 	// Start Menu UI
 	bool buttonStart 	= false;
-	bool buttonOptions 	= false;
 	bool buttonQuit 	= false;
 
 	// Lose Menu UI
 	bool buttonReturnToMenu = false;
 
 	//Rectangle buttonStartRect{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304, 256, 76};
-	//Rectangle buttonOptionsRect{SCREEN_WIDTH/2 - 100, 2*SCREEN_HEIGHT/4 - 75, 200, 150};
 	Rectangle buttonQuitRect{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76};
-
-	// Options Menu UI
-	bool buttonMenu_Options = false;
-
-	Rectangle buttonMenu_OptionsRect{SCREEN_WIDTH/3, 3*SCREEN_HEIGHT/4, 200, 150};
 
 
 	// Pause Menu UI
@@ -166,7 +177,8 @@ int main(void)
 
 
 	// Graphics Stuff
-	Texture2D atlas = LoadTexture("textures/atlas.png");
+	int textureIndex = 0;
+	Texture2D atlas = LoadTexture("textures/atlas0.png");
 
 	/// position for the vector on screen
 	const Vector2 posterPos = Vector2{SCREEN_WIDTH/2 - (256/2), AREA_HEIGHT};
@@ -207,9 +219,12 @@ int main(void)
 		UpdateMusicStream(bgm);
 
 		// TICK ALARMS
-		for(int i =0; i < ALARMFLAG_COUNT; i++)
+		if (!pauseFlag)
 		{
-			if (alarm[i] > 0) alarm[i]--;
+			for(int i =0; i < ALARMFLAG_COUNT; i++)
+			{
+				if (alarm[i] > 0) alarm[i]--;
+			}
 		}
 
 		// CHECK ALARMS	#{
@@ -219,7 +234,6 @@ int main(void)
 
 			// resume play
 			flags[GAME_IN_PLAY] = true;
-			cout << "allTargets.size() : " << allTargets.size() << endl;
 		}
 		if (flags[DRUMROLL] && alarm[2] == 0)
 		{
@@ -231,7 +245,6 @@ int main(void)
 		}
 		if (flags[TARGET_MISSED] && alarm[3] == 0)
 		{
-			// TODO puppeteer the -10 text either here or directly in draw
 			flags[TARGET_MISSED] = false;
 		}
 		if (flags[TARGET_HIGHLIGHT] && alarm[4] == 0)
@@ -269,6 +282,13 @@ int main(void)
 		}	// }#
 		if (flags[LOSE_TIMER] && alarm[LOSE_TIMER] == 0)
 		{
+			UpdateScores(level);
+			for(int i = 0; i < 5; i++)
+			{
+				std::cout << scores[i] << " ";
+			}
+			std::cout << std::endl;
+
 			flags[LOSE_TIMER] = false;
 			flags[LOSE_SCREEN] = true;
 		}	// }#
@@ -285,12 +305,7 @@ int main(void)
 		}
 		else if (flags[COUNTUP])
 		{
-			// update score as alarm ticks down
-			//int _a = static_cast<int>(SCORE_COUNTUP_DURATION * FPS_TARGET);
-			//int _a = static_cast<int>(FPS_TARGET/3);
-			//_a -= (_a % 5);	// now 5 | _a
-
-			if (((alarm[COUNTUP] % (FPS_TARGET/12)) == 0) && counter[0] < 5)// && alarm[COUNTUP] > SCORE_COUNTUP_DURATION * 0.5)
+			if (((alarm[COUNTUP] % (FPS_TARGET/12)) == 0) && counter[0] < 5)
 			{
 				counter[0]++;
 				counter[1]++;
@@ -316,14 +331,13 @@ int main(void)
 			level = FIRST_LEVEL;
 
 			// start the timer
-			counter[1] = 10;
+			counter[1] = INITIAL_SECONDS;
 			counter[2] = FPS_TARGET;
 
 			flags[LOSE_SCREEN] = false;
 			flags[GAME_IN_PLAY] = false;
 			flags[ROUND_BUFFER] = true;
 			alarm[ROUND_BUFFER] = AlarmDuration(ROUND_BUFFER);
-			//initializeLevel(allTargets, level);
 		}
 		else if (buttonReturnToMenu)
 		{
@@ -331,9 +345,11 @@ int main(void)
 			// the typical end screen? maybe instead we set the seconds to 0 and then
 			// simply unpause?
 
+			buttonReturnToMenu = false;
+
 			level = 0;
 			pauseFlag = false;
-			for(int i = 0; i < 10; i++)
+			for(int i = 0; i < ALARMFLAG_COUNT; i++)
 			{
 				alarm[i] = 0;
 				flags[i] = false;
@@ -350,7 +366,8 @@ int main(void)
 				{
 					updateTargets(allTargets, GetTime() - timeLevelStart);
 					tickSeconds(counter[1], counter[2]);
-					if (counter[1] <= 0 && counter[2] <= 1)
+					if (counter[1] < 0) counter[1] = 0;
+					if (counter[1] == 0 && counter[2] <= 1)
 					{
 						// LOSE_TIMER game
 						flags[GAME_IN_PLAY] = false;
@@ -395,16 +412,17 @@ int main(void)
 								for(; iter != iEnd; iter++)
 								{
 									// skip element if it's outside of the click range or isn't actually a smaller distance
-									if ((d = hamelDistance(iter->getCenter(), mx, my)) < CLICK_RANGE && d < leastDistance) continue;
+									if ((d = hamelDistance(iter->getCenter(), mx, my)) > CLICK_RANGE || d > leastDistance) continue;
 
 									leastDistance = d;
+									highlightTextOrigin = iter->getCenter();
 									selectedTarget = *iter;
 								}
 
 								if (leastDistance != EXCESSIVE_DISTANCE)
 								{
 									// remove some time
-									counter[1] -= 10;
+									counter[1] = (counter[1] < 10) ? (counter[2] = 0) : counter[1] - 10;
 									flags[TARGET_MISSED] = true;
 									alarm[TARGET_MISSED] = AlarmDuration(TARGET_MISSED);
 								}
@@ -425,31 +443,17 @@ int main(void)
 			{
 				updateTargets(menuTargets, GetTime());
 
-				if (buttonOptions)
+				// when the user clicks the poster it will play a sound effect and swap out the textures
+				if(HiddenButton(Rectangle{AREA_WIDTH/2 - 128, AREA_HEIGHT/2 - 96 - 48, 256, 192}))
 				{
-					buttonOptions = false;
+					textureIndex++;
+					if (textureIndex > HIGHEST_TEXTURE_INDEX) textureIndex = 0;
 
-					level = -1;	// choose options menu
-				}
-				else if (buttonQuit)
-				{
-					buttonQuit = false;
-
-					// TODO replace with a clean shutdown function?
-					CloseWindow();
+					char buf[30];
+					std::sprintf(buf, "textures/atlas%d.png", textureIndex);
+					atlas = LoadTexture(buf);
 				}
 			}	// }#
-			else	// OPTIONS MENU #{
-			{
-				if (buttonMenu_Options)
-				{
-					buttonMenu_Options = false;
-					// TODO save whatever's been changed to a file or something
-
-					// switch back to main menu
-					level = 0;
-				}
-			} // }#
 		}
 
 		//----------------------------------------------------------------------------------
@@ -460,8 +464,8 @@ int main(void)
 			// DRAW MENU #{
 			if(level == 0)
 			{
-				ClearBackground(BLACK);
-				DrawRectangleRec(Rectangle{150,0,SCREEN_WIDTH - 300,SCREEN_HEIGHT}, BLACK);
+				ClearBackground(NEARBLACK);
+				//DrawRectangleRec(Rectangle{150,0,SCREEN_WIDTH - 300,SCREEN_HEIGHT}, BLACK);
 				DrawTextureRec(atlas, posterSourceRect, Vector2{AREA_WIDTH/2 - 128, AREA_HEIGHT/2 - 96 - 48}, RAYWHITE);
 				int time = static_cast<int>(GetTime()) % 12;
 
@@ -473,13 +477,7 @@ int main(void)
 					DrawTarget(t, atlas);
 
 				buttonStart = ImageButton(atlas, PLAY);
-				//buttonOptions = GuiImageButtonEx(buttonOptionsRect, "", uiTexture, RECT_OPTIONS);
 				buttonQuit = ImageButton(atlas, QUIT);
-
-			}/*}#*/
-			/* DRAW OPTIONS MENU  #{*/
-			else if (level == -1)
-			{
 
 			}/*}#*/
 			// DRAW GAME #{
@@ -499,10 +497,12 @@ int main(void)
 						// the typical end screen? maybe instead we set the seconds to 0 and then
 						// simply unpause?
 
-						level = 0;
+						//level = 0;
 						pauseFlag = false;
 						// reset any game state flags and alarms
 						ResetGameFlags();
+						counter[1] = counter[2] = 0;
+						flags[LOSE_SCREEN] = true;
 
 						allTargets.clear();
 					}
@@ -510,8 +510,12 @@ int main(void)
 				// LOSE DRAW
 				else if (flags[LOSE_SCREEN])
 				{
-					buttonStart = ImageButtonEx(RECT_BUTTON[PLAY_AGAIN], atlas, RECT_PLAY_AGAIN);
-					buttonReturnToMenu = ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 128, AREA_HEIGHT/2 +38, 256, 76}, atlas, RECT_QUIT);
+					ClearBackground(NEARBLACK);
+
+
+
+					buttonStart = ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*3, 256, 76}, atlas, RECT_PLAY_AGAIN);
+					buttonReturnToMenu = ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*2, 256, 76}, atlas, RECT_QUIT);
 				}
 				// PREROUND DRAW
 				else if (flags[PREROUND])
@@ -547,7 +551,7 @@ int main(void)
 				// MAIN DRAW
 				else
 				{
-					if (alarm[3] > 0)//0.5 * AlarmDuration(TARGET_MISSED))	// red background
+					if (flags[LOSE_TIMER] || alarm[3] > 0)//0.5 * AlarmDuration(TARGET_MISSED))	// red background
 						ClearBackground(MAROON);
 					else if (flags[TARGET_HIGHLIGHT] || flags[COUNTUP])												// yellow
 						ClearBackground(MUSTARD);
@@ -561,6 +565,7 @@ int main(void)
 						auto iEnd = allTargets.end();
 						for(; iter != iEnd; iter++)
 						{
+							if (*iter == selectedTarget && flags[TARGET_MISSED]) continue;
 							DrawTarget(*iter, atlas);
 						}
 					}
@@ -587,6 +592,10 @@ int main(void)
 					// draw time left
 					DrawTextureRec(atlas, RECT_TIME, Vector2{posterPos.x + 288, posterPos.y + 8}, WHITE);
 					DrawTimerAt(atlas, counter[1], Vector2{posterPos.x + 320, posterPos.y + 23});
+
+					// draw miss text if the TARGET_MISSED still be goin
+					if (flags[TARGET_MISSED])
+						DrawText("-10", highlightTextOrigin.x - 32, highlightTextOrigin.y - 32, 48, RAYWHITE);
 
 					pauseFlag = ImageButton(atlas, PAUSE);
 				}

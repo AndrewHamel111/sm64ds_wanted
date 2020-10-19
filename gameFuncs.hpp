@@ -118,8 +118,6 @@ void populateWithRandomTargets(std::vector<target>& targets, std::vector<Vector2
 			l = 0;
 		}
 	}
-
-	std::cout << "populate > targets.size() : " << targets.size() << std::endl;
 }
 
 std::vector<target> initializeLevel(std::vector<target>& targets, int level)
@@ -400,7 +398,7 @@ void DrawTarget(target t, Texture2D facesSmallTexture)
 	#ifndef USE_DEV_SQUARES
 	// use faces.png
 	if (t.isMenu())
-		DrawTextureRec(facesSmallTexture, t.getSpriteRect(), t.getPos(), DARKGRAY);
+		DrawTextureRec(facesSmallTexture, t.getSpriteRect(), t.getPos(), BLACK);
 	else
 		DrawTextureRec(facesSmallTexture, t.getSpriteRect(), t.getPos(), WHITE);
 	#else
@@ -510,8 +508,19 @@ void DrawTimerAt(Texture2D atlas, int num, Vector2 center)
 		DrawNumberAt(atlas, num, center);
 }
 
-void ResetGameFlags(std::array<int> indices)
+// void ResetGameFlags(std::array<int> indices)
+// {
+	// for(int i : indices)
+	// {
+		// alarm[i] = 0;
+		// flags[i] = false;
+	// }
+// }
+
+void ResetGameFlags()
 {
+	// removed GAME_IN_PLAY
+	int indices[] = {GAME_IN_PLAY, PREROUND, DRUMROLL, TARGET_MISSED, TARGET_HIGHLIGHT, ROUND_BUFFER, COUNTUP, LOSE_TIMER, GAME_PAUSED, LOSE_SCREEN};
 	for(int i : indices)
 	{
 		alarm[i] = 0;
@@ -519,10 +528,19 @@ void ResetGameFlags(std::array<int> indices)
 	}
 }
 
-void ResetGameFlags()
+void UpdateScores(int score)
 {
-	int indices[] = {GAME_IN_PLAY, PREROUND, DRUMROLL, TARGET_MISSED, TARGET_HIGHLIGHT, ROUND_BUFFER, COUNTUP, LOSE_TIMER, GAME_PAUSED, LOSE_SCREEN};
-	ResetGameFlags(indices);
+	std::vector<int> v{6};
+	for(int i = 0; i < 5; i++)
+		v[i] = scores[i];
+	
+	v[5] = score;
+	
+	// sorts using <, so v[5] > v[4] > v[3] > v[2] > v[1] > v[0]
+	// v[0] is excluded since we are only concerned with the top 5
+	std::sort(v.begin(), v.end());
+	for(int i = 0; i < 5; i++)
+		scores[i] = v[5 - i];
 }
 
 #endif

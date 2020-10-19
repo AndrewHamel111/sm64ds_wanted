@@ -84,7 +84,7 @@ public:
 	void update(double);
 
 	// draw methods
-	void DrawTarget();
+	//void DrawTarget();
 };/*}#*/
 
 // constructor definitions for class target/*#{*/
@@ -357,7 +357,9 @@ void target::bounce()
 	v.x = cos(angle);
 	v.y = sin(angle);
 
-	if ((a = position.x > AREA_WIDTH) || position.x < 0)
+	Vector2 center = getCenter();
+
+	if ((a = center.x > AREA_WIDTH) || center.x < 0)
 	{
 		v.x *= -1;
 		flag = true;
@@ -371,10 +373,18 @@ void target::bounce()
 		}
 	}
 
-	if (position.y > AREA_HEIGHT || position.y < 0)
+	if ((a = center.y > AREA_HEIGHT) || center.y < 0)
 	{
 		v.y *= -1;
 		flag = true;
+		if (a)
+		{
+			position.y -= speed * BOUNCE_OFFSET;
+		}
+		else
+		{
+			position.y += speed * BOUNCE_OFFSET;
+		}
 	}
 
 	if (flag)

@@ -104,4 +104,14 @@ bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 
 	return ImageButtonEx(bounds, atlas, src);
 }
+
+/**
+* @param bounds Defines the area of the hidden button.
+* @return True iff the button is pressed this frame.
+*/
+bool HiddenButton(Rectangle bounds)
+{
+	return Vector2{GetMouseX(), GetMouseY()} < bounds && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+}
+
 #endif
