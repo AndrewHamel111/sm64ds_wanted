@@ -15,6 +15,7 @@ The game is built in C++ using Raylib which means no overhead that comes from us
 As this is my first time actually distributing a binary that many people will use, there's no actual "installation" process and instead it's **as simple as extracting a zip**. Select the latest release from the Releases on the right hand side and extract the contents to a folder. We recommend it's own folder since wanted_.exe will generate files in its directory to store player data.
 
 You can get the zip on the right side of the screen here.
+![imgur](https://i.imgur.com/YyRmBaS.png)
 
 ## Accessing the Leaderboard
 
