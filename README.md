@@ -14,6 +14,8 @@ The game is built in C++ using Raylib which means no overhead that comes from us
 
 As this is my first time actually distributing a binary that many people will use, there's no actual "installation" process and instead it's **as simple as extracting a zip**. Select the latest release from the Releases on the right hand side and extract the contents to a folder. We recommend it's own folder since wanted_.exe will generate files in its directory to store player data.
 
+You can get the zip on the right side of the screen here.
+
 ## Accessing the Leaderboard
 
 The current state of the leaderboard can be viewed [here](http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/leaderboard.php). At the end of each game you will also be presented with the top 5 scores in both the All Players and Nicktober categories.
