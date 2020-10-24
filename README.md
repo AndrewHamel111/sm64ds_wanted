@@ -23,7 +23,7 @@ Make sure you choose the zip.
 
 ## Accessing the Leaderboard
 
-The current state of the leaderboard can be viewed <a href=http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/leaderboard.php target="_blank" >here</a>. At the end of each game you will also be presented with the top 5 scores in both the All Players and Nicktober categories.
+The current state of the leaderboard can be viewed <a href="http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/leaderboard.php" target="_blank" >here</a>. At the end of each game you will also be presented with the top 5 scores in both the All Players and Nicktober categories.
 
 ## About Nicktober
 
