@@ -1,15 +1,6 @@
 #ifndef GAMEFUNCS_H_
 #define GAMEFUNCS_H_
 
-#include <vector>
-#include <utility>
-#include <cstdlib>
-#include <iterator>
-#include <iostream>
-
-#include <random>
-#include <algorithm>
-
 void updateTargets(std::vector<target>& targets, double time)
 {
 	auto iter = targets.begin();
@@ -41,9 +32,24 @@ float randomY()
 	return ( rand() % (AREA_HEIGHT) ) - 0.5 * TARGET_HEIGHT;
 }
 
+float randomXStrict()
+{
+	return ( rand() % (AREA_WIDTH - 100) ) + 100;
+}
+
+float randomYStrict()
+{
+	return ( rand() % (AREA_HEIGHT - 100) ) + 100;
+}
+
 Vector2 randomXY()
 {
 	return Vector2{randomX(),randomY()};
+}
+
+Vector2 randomXYStrict()
+{
+	return Vector2{randomXStrict(),randomYStrict()};
 }
 
 Vector2 randomXYWithConsideration(std::vector<Vector2>& spots)
@@ -197,7 +203,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				// special stage so we will do the populate in here and then return targets
 
 				// here's all the sprite choices
-				std::vector<Rectangle> rects = { criminalPosterRects[0], criminalPosterRects[1], criminalPosterRects[2], criminalPosterRects[3] };
+				std::vector<RayRectangle> rects = { criminalPosterRects[0], criminalPosterRects[1], criminalPosterRects[2], criminalPosterRects[3] };
 
 				// shuffle them
 				std::random_device rd;
@@ -206,7 +212,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				std::shuffle(rects.begin(), rects.end(), g);
 
 				// pick one to be wanted
-				Rectangle wRect = rects[0];
+				RayRectangle wRect = rects[0];
 				rects.erase(rects.begin());
 
 				Vector2 v;
@@ -222,7 +228,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 						//l = (i * 7) + j;
 						double angle = ((i % 2) == 0) ? PI/2 : 3*PI/2;
 
-						//(Vector2, MoveAI, 	double, int, 	Rectangle)
+						//(Vector2, MoveAI, 	double, int, 	RayRectangle)
 						//(pos, 	movetype, 	angle, 	speed, 	spriteRect)
 						// i * 7 ranges from 0 to 7 (8 cols)
 						// j ranges 0 to 5 			(6 rows)
@@ -245,7 +251,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				// special stage so we will do the populate in here and then return targets
 
 				// here's all the sprite choices
-				std::vector<Rectangle> rects = { criminalPosterRects[0], criminalPosterRects[1], criminalPosterRects[2], criminalPosterRects[3] };
+				std::vector<RayRectangle> rects = { criminalPosterRects[0], criminalPosterRects[1], criminalPosterRects[2], criminalPosterRects[3] };
 
 				// shuffle them
 				std::random_device rd;
@@ -254,7 +260,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				std::shuffle(rects.begin(), rects.end(), g);
 
 				// pick one to be wanted
-				Rectangle wRect = rects[0];
+				RayRectangle wRect = rects[0];
 				rects.erase(rects.begin());
 
 				Vector2 v;
@@ -265,7 +271,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				{
 					v = Vector2{static_cast<float>(i) * TARGET_HEIGHT, -0.7 * TARGET_HEIGHT};
 
-					//(Vector2, MoveAI, 	double, int, 	Rectangle)
+					//(Vector2, MoveAI, 	double, int, 	RayRectangle)
 					//(pos, 	movetype, 	angle, 	speed, 	spriteRect)
 					// i * 7 ranges from 0 to 7 (8 cols)
 					// j ranges 0 to 5 			(6 rows)
@@ -305,10 +311,17 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 		{
 			spots = generateSpots(4 * (12 + level));
 
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_ONE]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_TWO]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_THREE]);
-			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, randomAngle(), randomSpeed(), criminalPosterRects[RECT_FOUR]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, 0, randomSpeed(), criminalPosterRects[RECT_ONE]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, 0, randomSpeed(), criminalPosterRects[RECT_TWO]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, 0, randomSpeed(), criminalPosterRects[RECT_THREE]);
+			templates.emplace_back(DIRECTION_ANGLE_W_BOUNCE, 0, randomSpeed(), criminalPosterRects[RECT_FOUR]);
+			
+			populateWithRandomTargets(targets, spots, templates);
+			auto i = targets.begin(), iE = targets.end();
+			while(i != iE)
+				(i++)->setAngle(randomAngle());
+			
+			return targets;
 		}
 		else if (level == 19)	// DIRECTION_SIN
 		{
@@ -417,13 +430,18 @@ void DrawTarget(target t, Texture2D facesSmallTexture)
 	#endif
 }
 
-Rectangle GetDigitRect(int digit)
+RayRectangle GetDigitRect(int digit)
 {
-	return Rectangle{470 + (digit * 30), 100, 30, 30};
+	return RayRectangle{470 + (digit * 30), 100, 30, 30};
 }
 
-void tickSeconds(int& seconds, int& frames)
+void tickSeconds(int& seconds, int& frames, int level)
 {
+	// extra ticks for higher levels
+	if (level > 100) frames--;
+	else if (level > 75) if (frames % 2 == 0) frames--;
+	else if (level > 50) if (frames % 3 == 0) frames--;
+		
 	frames--;
 	if (frames <= 1)
 	{
@@ -524,7 +542,7 @@ void DrawNumberAtLeftJustified(Texture2D atlas, int num, Vector2 center)
 		DrawTextureRec(atlas, GetDigitRect(num / 1000), Vector2{center.x - 15, center.y + 15}, WHITE);
 		DrawTextureRec(atlas, GetDigitRect((num / 100) % 10), Vector2{center.x + 15, center.y + 15}, WHITE);
 		DrawTextureRec(atlas, GetDigitRect((num / 10) % 10), Vector2{center.x + 45, center.y + 15}, WHITE);
-		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 60, center.y + 15}, WHITE);
+		DrawTextureRec(atlas, GetDigitRect(num % 10), Vector2{center.x + 75, center.y + 15}, WHITE);
 	}
 }
 
@@ -539,15 +557,6 @@ void DrawTimerAt(Texture2D atlas, int num, Vector2 center)
 		DrawNumberAt(atlas, num, center);
 }
 
-// void ResetGameFlags(std::array<int> indices)
-// {
-	// for(int i : indices)
-	// {
-		// alarm[i] = 0;
-		// flags[i] = false;
-	// }
-// }
-
 void ResetGameFlags()
 {
 	// removed GAME_IN_PLAY
@@ -557,61 +566,6 @@ void ResetGameFlags()
 		alarm[i] = 0;
 		flags[i] = false;
 	}
-}
-
-/**
-* @brief selection sort for an array of 5 ints
-* @param array pointer to an array of 5 ints
-* @return true when it's successfully sorted (tautology)
-*/
-bool SortScores(unsigned short int* array)
-{
-	// array will always have 5 elements
-	int max;
-	int maxIndex;
-
-	for(int i = 0; i < 5; i++)
-	{
-		max = array[i];
-		maxIndex = i;
-
-		// find the max between i and end of array
-		for(int j = i + 1; j < 5; j++)
-		{
-			if (array[j] > max)
-			{
-				max = array[j];
-				maxIndex = j;
-			}
-		}
-
-		// swap max to i
-		int temp = array[i];
-		array[i] = array[maxIndex];
-		array[maxIndex] = temp;
-	}
-
-	return (array[5] >= array[4] && array[4] >= array[3] && array[3] >= array[2] && array[2] >= array[1] && array[1] >= array[0]);
-}
-
-bool UpdateScores(unsigned short int* scores, unsigned short int score)
-{
-	for(int i = 0; i < 5; i++)
-	{
-		if (score > scores[i])
-		{
-			for(int j = 4; j > i; j--)
-			{
-				scores[j] = scores[j - 1];
-			}
-			scores[i] = score;
-
-			// score made it into the high score table
-			return true;
-		}
-	}
-
-	return false;
 }
 
 void EggUpdate(bool* arr, int num)
@@ -703,6 +657,20 @@ bool EggCheck(bool* arr, int num)
 	}
 
 	return false;
+}
+
+void DrawTextCentered(const char* text, float posX, float posY, int fontSize, Color color)
+{
+	// int offset = (strlen(text)) * 24 / 35 * fontSize;
+	// offset /= 2;
+	float offset = MeasureTextEx(gameboyFont, text, fontSize, 0).x/2;
+
+	RayDrawTextEx(gameboyFont, text, Vector2{posX - offset, posY}, fontSize, 0, color);
+}
+
+void DrawTextCentered(const char* text, Vector2 pos, int fontSize, Color color)
+{
+	DrawTextCentered(text, pos.x, pos.y, fontSize, color);
 }
 
 #endif

@@ -14,10 +14,10 @@ enum MoveAI
 
 enum SpriteRectEnum
 {
-	RECT_ONE,	// Rectangle{0,0,100,100}
-	RECT_TWO,	// Rectangle{100,0,100,100}
-	RECT_THREE,	// Rectangle{200,0,100,100}
-	RECT_FOUR	// Rectangle{300,0,100,100}
+	RECT_ONE,	// RayRectangle{0,0,100,100}
+	RECT_TWO,	// RayRectangle{100,0,100,100}
+	RECT_THREE,	// RayRectangle{200,0,100,100}
+	RECT_FOUR	// RayRectangle{300,0,100,100}
 };
 
 enum GAME_FLAG
@@ -32,7 +32,8 @@ enum GAME_FLAG
 	LOSE_TIMER,	// not implemented
 	FLAG_MUTE,
 	GAME_PAUSED,
-  LOSE_SCREEN
+  LOSE_SCREEN,
+  SET_NAME
 };
 
 enum BUTTON_ID
@@ -54,6 +55,13 @@ enum STORAGE_VALUE_POSITION
   HI_SCORE4,
   HI_SCORE5,
   TEXTURE_PREFERENCE
+};
+
+enum SOUND_EFFECTS_INDEX
+{
+	MISS_SND =0,
+	LOSE_SND =1,
+	POINTS_SND =2
 };
 
 #endif
