@@ -6,16 +6,13 @@
 	BUGS I'M ALLOWING
 - since updateTargets use GetTime() - startTime, pausing doesn't effect this so sin rounds will have some weird behaviour]
 
-	V1.01 CHANGES
-+ implemented a virtual cursor
-~ fixed an exploit where the user could freeze the game and have endless time to find stationary targets
-+ mouseOutOfBounds : true when mouse out of bounds or window loses focus
-~ volume now doesn't default to 100% (sorry folks)
+	V1.02 CHANGES
+~ ACTUALLY fixed the exploit for real (and I bet this is the last time you'll hear about it)
 + added bugs
 
 ********************************************************************************************/
 
-#define WANTED_VERSION 1.01
+#define WANTED_VERSION 1.02
 
 #include "raylib.h"
 #define NEARBLACK CLITERAL(Color){ 20, 20, 20, 255}
@@ -122,7 +119,7 @@ Font gameboyFont;
 Vector2 lastCursorPosition{0,0};
 Vector2 virtualCursorPos{0,0};
 bool mouseOutOfBounds = false;
-int cheese_keys[] = {KEY_LEFT_SUPER, KEY_RIGHT_SUPER, KEY_LEFT_ALT, KEY_RIGHT_ALT, KEY_KB_MENU};
+int cheese_keys[] = {KEY_LEFT_SUPER, KEY_RIGHT_SUPER, KEY_LEFT_ALT, KEY_RIGHT_ALT, KEY_KB_MENU, KEY_LEFT_CONTROL, KEY_RIGHT_CONTROL};
 
 #include "enums.hpp"
 #include "target.hpp"
@@ -377,7 +374,7 @@ int main(void)
 				pauseFlag = true;
 		
 		// CTRL centers cursor
-		if(IsKeyPressed(KEY_LEFT_CONTROL) || IsKeyPressed(KEY_RIGHT_CONTROL))
+		if(IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT))
 			virtualCursorPos = Vector2{AREA_WIDTH/2, AREA_HEIGHT/2};
 		
 		// each song has 5 seconds of silence at the end as a buffer
@@ -511,7 +508,7 @@ int main(void)
 		}
 		else if (pauseFlag)
 		{
-
+			
 		}
 		else if (flags[COUNTUP])
 		{
@@ -746,6 +743,8 @@ int main(void)
 			// START MENU #{
 			else if (level == 0)
 			{
+				pauseFlag = false;
+				
 				updateTargets(menuTargets, GetTime());
 
 				Color col = RAYWHITE;
@@ -783,15 +782,6 @@ int main(void)
 						EEcounter1[2]++;
 					}
 				}
-				
-				if (drawUpdateButton && ImageButtonEx(RayRectangle{SCREEN_WIDTH/2 - 154,360, 312,80}, atlas, RECT_UPDATE_BUTTON))
-				{
-					OpenURL(downloadURL.c_str());
-				}
-				
-				if(virtualCursorPos < RayRectangle{SCREEN_WIDTH/2 - 120, SCREEN_HEIGHT - 85, 200 + 40, 60})
-					RayDrawText("MASTER VOLUME", SCREEN_WIDTH/2 - 90, SCREEN_HEIGHT - 105, 20, BLUE);
-				SliderBarCenter(Vector2{SCREEN_WIDTH/2, SCREEN_HEIGHT - 55}, 200, &volumePercent);
 			}	// }#
 		}
 
@@ -818,6 +808,7 @@ int main(void)
 			}
 			else if(level == 0)
 			{
+				
 				if(EEcounter1[1] > 0) EEcounter1[1]--;
 				if (EEcounter1[1] == 0 && EEcounter1[2] >= 4)
 				{
@@ -863,6 +854,15 @@ int main(void)
 				}
 				
 				buttonQuit = ImageButton(atlas, QUIT);
+				
+				if (drawUpdateButton && ImageButtonEx(RayRectangle{SCREEN_WIDTH/2 - 154,360, 312,80}, atlas, RECT_UPDATE_BUTTON))
+				{
+					OpenURL(downloadURL.c_str());
+				}
+				
+				if(virtualCursorPos < RayRectangle{SCREEN_WIDTH/2 - 120, SCREEN_HEIGHT - 85, 200 + 40, 60})
+					RayDrawText("MASTER VOLUME", SCREEN_WIDTH/2 - 90, SCREEN_HEIGHT - 105, 20, BLUE);
+				SliderBarCenter(Vector2{SCREEN_WIDTH/2, SCREEN_HEIGHT - 55}, 200, &volumePercent);
 
 			}/*}#*/
 			// DRAW GAME #{
@@ -1158,7 +1158,7 @@ int main(void)
 			
 			// If cursor is off screen, remind the player they can return it to the screen.
 			if (mouseOutOfBounds)
-				DrawTextCentered("PRESS CTRL TO CENTER CURSOR", SCREEN_WIDTH/2, 40, 15, RAYWHITE);
+				DrawTextCentered("PRESS SHIFT TO CENTER CURSOR", SCREEN_WIDTH/2, 40, 15, RAYWHITE);
 			
 			// RayDrawText((std::to_string(virtualCursorPos.x) + ", " + std::to_string(virtualCursorPos.y)).c_str(), 0, 0, 20, RAYWHITE);
 			// RayDrawText(std::to_string(virtualCursorPos.x).c_str(), 0, 0, 10, RAYWHITE);
