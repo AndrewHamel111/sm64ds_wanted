@@ -508,7 +508,8 @@ int main(void)
 		}
 		else if (pauseFlag)
 		{
-			
+			// this line is the only reason I had to fucking update again
+			if (level == 0) pauseFlag = false;
 		}
 		else if (flags[COUNTUP])
 		{
