@@ -6,13 +6,12 @@
 	BUGS I'M ALLOWING
 - since updateTargets use GetTime() - startTime, pausing doesn't effect this so sin rounds will have some weird behaviour]
 
-	V1.02 CHANGES
-~ ACTUALLY fixed the exploit for real (and I bet this is the last time you'll hear about it)
-+ added bugs
+	V1.04 CHANGES
+	 
 
 ********************************************************************************************/
 
-#define WANTED_VERSION 1.02
+#define WANTED_VERSION 1.04
 
 #include "raylib.h"
 #define NEARBLACK CLITERAL(Color){ 20, 20, 20, 255}
