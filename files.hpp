@@ -148,12 +148,14 @@ void LoadSounds(std::vector<std::vector<Sound>>* character_sounds, std::vector<s
 
 void GetNames(std::vector<std::string>& names)
 {
-	http::Request request("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/nicktober_names.csv");
-	const http::Response response = request.send("GET");
+	std::string _str = getBodyFromURL("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/nicktober_names.csv");
+	// http::Request request("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/nicktober_names.csv");
+	// const http::Response response = request.send("GET");
+	// std::string _str = std::string(response.body.begin(), response.body.end());
 
 	names.clear();
 
-	std::stringstream str(std::string(response.body.begin(), response.body.end()));
+	std::stringstream str(_str);
 	std::string s;
 	while (std::getline(str, s, ',')) names.push_back(s);
 
@@ -163,10 +165,14 @@ void GetNames(std::vector<std::string>& names)
 void DownloadScores(score_vector& scores)
 {
 	// new version using HTTPRequest.hpp and jute.h
-	http::Request request("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/scoreboard.json");
-	const http::Response response = request.send("GET");
+	
+	// retrieve string from url (getBodyFromURL(std::string))
+	// http::Request request("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/scoreboard.json");
+	// const http::Response response = request.send("GET");
+	// std::string str = std::string(response.body.begin(), response.body.end());
+	std::string str = getBodyFromURL("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/scoreboard.json");
 
-	jute::jValue board = jute::parser::parse(std::string(response.body.begin(), response.body.end()));
+	jute::jValue board = jute::parser::parse(str);
 
 	std::vector<std::string> keys = board.get_keys();
 	int s = keys.size();
@@ -187,17 +193,21 @@ void DownloadScores(score_vector& scores)
 }
 
 void UploadScore(score_pair score)
-{
-	try
-	{
-		http::Request request("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/update.php");
-		std::string str = "name=" + score.first + "&score=" + std::to_string(score.second);
-		const http::Response response = request.send("POST", str, {"Content-Type: application/x-www-form-urlencoded"});
-	}
-	catch (const std::exception& e)
-	{
-		std::cout << "can't upload scores to server! fuck!\n";
-	}
+{	
+	std::string str = "name=" + score.first + "&score=" + std::to_string(score.second);
+	sendPostRequest("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/update.php", str);
+	// try
+	// {
+		// std::string str = "name=" + score.first + "&score=" + std::to_string(score.second);
+		
+		//send post request (sendPostRequest(std::string url, std::string post))
+		// http::Request request("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/update.php");
+		// const http::Response response = request.send("POST", str, {"Content-Type: application/x-www-form-urlencoded"});
+	// }
+	// catch (const std::exception& e)
+	// {
+		// std::cout << "can't upload scores to server! fuck!\n";
+	// }
 }
 
 void UpdateScores(score_vector& scores, score_pair score)
@@ -208,13 +218,17 @@ void UpdateScores(score_vector& scores, score_pair score)
 	DownloadScores(scores);
 }
 
-void CheckVersionJSON(bool* needUpdate, bool* drawUpdateButton, RayRectangle* buttonRect, std::string* url)
+void CheckVersionJSON(bool* needUpdate, bool* drawUpdateButton, Rectangle* buttonRect, std::string* url)
 {
 	// new version using HTTPRequest.hpp and jute.h
-	http::Request request("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/version.json");
-	const http::Response response = request.send("GET");
+	
+	// retrieve string from url (getBodyFromURL)
+	// http::Request request("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/version.json");
+	// const http::Response response = request.send("GET");
+	// string str = std::string(response.body.begin(), response.body.end());
+	std::string str = getBodyFromURL("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/version.json");
 
-	jute::jValue board = jute::parser::parse(std::string(response.body.begin(), response.body.end()));
+	jute::jValue board = jute::parser::parse(str);
 	
 	string_vector keys = board.get_keys();
 	auto i = keys.begin(), e = keys.end();
@@ -241,7 +255,7 @@ void CheckVersionJSON(bool* needUpdate, bool* drawUpdateButton, RayRectangle* bu
 		*drawUpdateButton = true;
 		
 		// also get the button Rect
-		*buttonRect = RayRectangle{board["button_x"].as_int(), board["button_y"].as_int(), board["button_width"].as_int(), board["button_height"].as_int()};
+		*buttonRect = Rectangle{board["button_x"].as_int(), board["button_y"].as_int(), board["button_width"].as_int(), board["button_height"].as_int()};
 		
 		// lastly the download page for the update
 		*url = board["download_url"].as_string();

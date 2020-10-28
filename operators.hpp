@@ -34,7 +34,7 @@ bool not_in(std::vector<std::string> names, std::string str)
 }
 
 ////////////////////////////
-// Raylib type extensions //
+// lib type extensions //
 ////////////////////////////
 
 // Vector addition
@@ -56,7 +56,7 @@ Vector2 operator-(const Vector2& a, const Vector2& b)
 }
 
 // vector < rectangle (vector in bounds)
-bool operator<(const Vector2& v, const RayRectangle& b)
+bool operator<(const Vector2& v, const Rectangle& b)
 {
 	return (v.x > b.x && b.x + b.width > v.x) && (v.y > b.y && b.y + b.height > v.y);
 }

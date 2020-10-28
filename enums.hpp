@@ -14,10 +14,10 @@ enum MoveAI
 
 enum SpriteRectEnum
 {
-	RECT_ONE,	// RayRectangle{0,0,100,100}
-	RECT_TWO,	// RayRectangle{100,0,100,100}
-	RECT_THREE,	// RayRectangle{200,0,100,100}
-	RECT_FOUR	// RayRectangle{300,0,100,100}
+	RECT_ONE,	// Rectangle{0,0,100,100}
+	RECT_TWO,	// Rectangle{100,0,100,100}
+	RECT_THREE,	// Rectangle{200,0,100,100}
+	RECT_FOUR	// Rectangle{300,0,100,100}
 };
 
 enum GAME_FLAG

@@ -7,12 +7,12 @@ struct target_template
 	MoveAI movetype;
 	double angle;
 	float speed;
-	RayRectangle rect;
+	Rectangle rect;
 
-	target_template(RayRectangle r): movetype{STATIONARY}, angle{0}, speed{0}, rect{r}
+	target_template(Rectangle r): movetype{STATIONARY}, angle{0}, speed{0}, rect{r}
 	{}
 
-	target_template(MoveAI m, double a, float s, RayRectangle r): movetype{m}, angle{a}, speed{s}, rect{r}
+	target_template(MoveAI m, double a, float s, Rectangle r): movetype{m}, angle{a}, speed{s}, rect{r}
 	{}
 };
 
@@ -31,7 +31,7 @@ class target
 	double angle;	// TODO write an access method that makes sure this shit is always radians o.O
 	float speed;
 
-	RayRectangle spriteRect;
+	Rectangle spriteRect;
 
 	// update methods
 	void move(double);
@@ -45,10 +45,10 @@ public:
 	target(float x, float y, MoveAI movetype, double angle,bool wanted);
 	target(float x, float y, MoveAI movetype, double angle,float speed);
 	target(Vector2 pos, MoveAI movetype, double angle,float speed);
-	target(Vector2 pos, MoveAI movetype, double angle,float speed, RayRectangle spriteRect);
+	target(Vector2 pos, MoveAI movetype, double angle,float speed, Rectangle spriteRect);
 
 	target(Vector2 pos, target_template t);
-	target(Vector2 pos, RayRectangle spriteRect);
+	target(Vector2 pos, Rectangle spriteRect);
 
 	// access methods
 	void setMoveType(MoveAI);
@@ -66,7 +66,7 @@ public:
 
 	void setSpeed(float);
 
-	void setSpriteRect(RayRectangle);
+	void setSpriteRect(Rectangle);
 
 	MoveAI getMoveType() const;
 
@@ -78,7 +78,7 @@ public:
 	bool isWanted() const;
 	bool isMenu() const;
 
-	RayRectangle getSpriteRect() const;
+	Rectangle getSpriteRect() const;
 
 	// update methods
 	void update(double);
@@ -140,7 +140,7 @@ target::target(Vector2 pos, MoveAI movetype, double angle,float speed): sinAmpli
 	setSpeed(speed);
 }
 
-target::target(Vector2 pos, MoveAI movetype, double angle,float speed, RayRectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
+target::target(Vector2 pos, MoveAI movetype, double angle,float speed, Rectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(pos);
 	setMoveType(movetype);
@@ -163,7 +163,7 @@ target::target(Vector2 pos, target_template t): sinAmplitude{BASE_SIN_AMPLITUDE}
 	setSpriteRect(t.rect);
 }
 
-target::target(Vector2 pos, RayRectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
+target::target(Vector2 pos, Rectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(pos);
 
@@ -246,7 +246,7 @@ void target::setSpeed(float speed)
 	this->speed = speed;
 }
 
-void target::setSpriteRect(RayRectangle rect)
+void target::setSpriteRect(Rectangle rect)
 {
 	this->spriteRect = rect;
 }
@@ -288,7 +288,7 @@ bool target::isMenu() const
 	return isMenuTarget;
 }
 
-RayRectangle target::getSpriteRect() const
+Rectangle target::getSpriteRect() const
 {
 	return spriteRect;
 }
@@ -411,7 +411,7 @@ void target::update(double time)
 		wrap();
 }
 
-bool operator==(const RayRectangle& lhs, const RayRectangle& rhs)
+bool operator==(const Rectangle& lhs, const Rectangle& rhs)
 {
 	return lhs.x == rhs.x; // && lhs.y == rhs.y;
 }

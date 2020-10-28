@@ -7,16 +7,16 @@
 /// and an alternate for what should be shown when hovering.
 /// @param bounds The bounds of the button {x,y,width,height} where x,y denote the top left corner
 /// @param atlas The Texture2D sprite atlas the button image will come from.
-/// @param source The RayRectangle describing the portion of the atlas containing the sprite.
+/// @param source The Rectangle describing the portion of the atlas containing the sprite.
 /// @param altSource Same as above, but for the alternate sprite that the button will switch to when hovered.
 /// @returns True iff the button is clicked on this frame.
-bool ImageButtonSpriteSwap(RayRectangle bounds, Texture2D atlas, RayRectangle source, RayRectangle altSource)
+bool ImageButtonSpriteSwap(Rectangle bounds, Texture2D atlas, Rectangle source, Rectangle altSource)
 {
 	Vector2 m = virtualCursorPos;
 	Color c = WHITE;
 	bool q = false;
 
-	RayRectangle src = source;
+	Rectangle src = source;
 
 	if (m < bounds)
 	{
@@ -39,9 +39,9 @@ bool ImageButtonSpriteSwap(RayRectangle bounds, Texture2D atlas, RayRectangle so
 /// A replacement for raygui::GuiImageButtonEx (which was not very good at all).
 /// @param bounds The bounds of the button {x,y,width,height} where x,y denote the top left corner
 /// @param atlas The Texture2D sprite atlas the button image will come from.
-/// @param source The RayRectangle describing the portion of the atlas containing the sprite.
+/// @param source The Rectangle describing the portion of the atlas containing the sprite.
 /// @returns True iff the button is clicked on this frame.
-bool ImageButtonEx(RayRectangle bounds, Texture2D atlas, RayRectangle source)
+bool ImageButtonEx(Rectangle bounds, Texture2D atlas, Rectangle source)
 {
 	Vector2 m = virtualCursorPos;
 	Color c = WHITE;
@@ -71,8 +71,8 @@ bool ImageButtonEx(RayRectangle bounds, Texture2D atlas, RayRectangle source)
 /// @returns True iff the button is clicked on this frame.
 bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 {
-	RayRectangle bounds;
-	RayRectangle src;
+	Rectangle bounds;
+	Rectangle src;
 
 	if (b_id == PLAY)
 	{
@@ -118,8 +118,8 @@ bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 		DrawTextureRec(atlas, RECT_UNMUTED, Vector2{bounds.x,bounds.y}, c);
 		if (p)
 		{
-			RayDrawText("SKIP", bounds.x + 11, bounds.y + 30, 8, RAYWHITE);
-			RayDrawText("SONG", bounds.x + 9, bounds.y + 38, 8, RAYWHITE);
+			DrawText("SKIP", bounds.x + 11, bounds.y + 30, 8, RAYWHITE);
+			DrawText("SONG", bounds.x + 9, bounds.y + 38, 8, RAYWHITE);
 		}
 		return q;
 	}
@@ -135,7 +135,7 @@ bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 * @param bounds Defines the area of the hidden button.
 * @return True iff the button is pressed this frame.
 */
-bool HiddenButton(RayRectangle bounds)
+bool HiddenButton(Rectangle bounds)
 {
 	return Vector2{virtualCursorPos.x, virtualCursorPos.y} < bounds && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
 }
@@ -147,7 +147,7 @@ bool HiddenButton(RayRectangle bounds)
 */
 float SliderBar(Vector2 start, float length, float* percent, float scale = 1.0)
 {	
-	bool isHovering = virtualCursorPos < RayRectangle{start.x - 20, start.y - 30, length + 40, 60};
+	bool isHovering = virtualCursorPos < Rectangle{start.x - 20, start.y - 30, length + 40, 60};
 	Color col;
 
 	  ////////////
@@ -183,8 +183,8 @@ float SliderBar(Vector2 start, float length, float* percent, float scale = 1.0)
 	handlePosition.x += (*percent) * length;
 	
 	// draw bar and handle
-	DrawRectangleRec(RayRectangle{start.x, start.y - SLIDER_HEIGHT/2, length, SLIDER_HEIGHT}, GRAY);
-	DrawRectangleRec(RayRectangle{handlePosition.x, handlePosition.y, SLIDER_HANDLE_HEIGHT, SLIDER_HANDLE_HEIGHT}, col);
+	DrawRectangleRec(Rectangle{start.x, start.y - SLIDER_HEIGHT/2, length, SLIDER_HEIGHT}, GRAY);
+	DrawRectangleRec(Rectangle{handlePosition.x, handlePosition.y, SLIDER_HANDLE_HEIGHT, SLIDER_HANDLE_HEIGHT}, col);
 	
 	return (*percent) * scale;
 }

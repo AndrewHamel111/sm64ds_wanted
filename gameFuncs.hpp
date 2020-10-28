@@ -203,7 +203,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				// special stage so we will do the populate in here and then return targets
 
 				// here's all the sprite choices
-				std::vector<RayRectangle> rects = { criminalPosterRects[0], criminalPosterRects[1], criminalPosterRects[2], criminalPosterRects[3] };
+				std::vector<Rectangle> rects = { criminalPosterRects[0], criminalPosterRects[1], criminalPosterRects[2], criminalPosterRects[3] };
 
 				// shuffle them
 				std::random_device rd;
@@ -212,7 +212,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				std::shuffle(rects.begin(), rects.end(), g);
 
 				// pick one to be wanted
-				RayRectangle wRect = rects[0];
+				Rectangle wRect = rects[0];
 				rects.erase(rects.begin());
 
 				Vector2 v;
@@ -228,7 +228,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 						//l = (i * 7) + j;
 						double angle = ((i % 2) == 0) ? PI/2 : 3*PI/2;
 
-						//(Vector2, MoveAI, 	double, int, 	RayRectangle)
+						//(Vector2, MoveAI, 	double, int, 	Rectangle)
 						//(pos, 	movetype, 	angle, 	speed, 	spriteRect)
 						// i * 7 ranges from 0 to 7 (8 cols)
 						// j ranges 0 to 5 			(6 rows)
@@ -251,7 +251,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				// special stage so we will do the populate in here and then return targets
 
 				// here's all the sprite choices
-				std::vector<RayRectangle> rects = { criminalPosterRects[0], criminalPosterRects[1], criminalPosterRects[2], criminalPosterRects[3] };
+				std::vector<Rectangle> rects = { criminalPosterRects[0], criminalPosterRects[1], criminalPosterRects[2], criminalPosterRects[3] };
 
 				// shuffle them
 				std::random_device rd;
@@ -260,7 +260,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				std::shuffle(rects.begin(), rects.end(), g);
 
 				// pick one to be wanted
-				RayRectangle wRect = rects[0];
+				Rectangle wRect = rects[0];
 				rects.erase(rects.begin());
 
 				Vector2 v;
@@ -271,7 +271,7 @@ std::vector<target> initializeLevel(std::vector<target>& targets, int level)
 				{
 					v = Vector2{static_cast<float>(i) * TARGET_HEIGHT, -0.7 * TARGET_HEIGHT};
 
-					//(Vector2, MoveAI, 	double, int, 	RayRectangle)
+					//(Vector2, MoveAI, 	double, int, 	Rectangle)
 					//(pos, 	movetype, 	angle, 	speed, 	spriteRect)
 					// i * 7 ranges from 0 to 7 (8 cols)
 					// j ranges 0 to 5 			(6 rows)
@@ -430,9 +430,9 @@ void DrawTarget(target t, Texture2D facesSmallTexture)
 	#endif
 }
 
-RayRectangle GetDigitRect(int digit)
+Rectangle GetDigitRect(int digit)
 {
-	return RayRectangle{470 + (digit * 30), 100, 30, 30};
+	return Rectangle{470 + (digit * 30), 100, 30, 30};
 }
 
 void tickSeconds(int& seconds, int& frames, int level)
@@ -665,7 +665,7 @@ void DrawTextCentered(const char* text, float posX, float posY, int fontSize, Co
 	// offset /= 2;
 	float offset = MeasureTextEx(gameboyFont, text, fontSize, 0).x/2;
 
-	RayDrawTextEx(gameboyFont, text, Vector2{posX - offset, posY}, fontSize, 0, color);
+	DrawTextEx(gameboyFont, text, Vector2{posX - offset, posY}, fontSize, 0, color);
 }
 
 void DrawTextCentered(const char* text, Vector2 pos, int fontSize, Color color)

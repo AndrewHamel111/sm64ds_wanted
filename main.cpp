@@ -17,6 +17,9 @@
 #define NEARBLACK CLITERAL(Color){ 20, 20, 20, 255}
 #define MUSTARD CLITERAL(Color){ 203, 182, 51, 255}
 
+//#include "HTTPRequest.hpp"
+#include "network.hpp"
+	
 #include "jute.h"
 // included from jute
 // #include <iostream>
@@ -26,8 +29,7 @@
 // #include <sstream>
 // #include <fstream>
 // #include <cstring>
-#include "HTTPRequest.hpp"
-
+	
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -39,32 +41,32 @@
 #include "constants.hpp"
 
 // SPRITE SOURCE RECTANGLES, IMPORTANT TO CHANGE IF/WHEN SOURCE SPRITE CHANGES
-RayRectangle criminalPosterRects[] = { RayRectangle{76,0,100,100}, RayRectangle{332,0,100,100},RayRectangle{588,0,100,100},RayRectangle{844,0,100,100}};
-RayRectangle posterSourceRects[] = { RayRectangle{76,316,100,100}, RayRectangle{332,316,100,100},RayRectangle{588,316,100,100},RayRectangle{844,316,100,100}};
+Rectangle criminalPosterRects[] = { Rectangle{76,0,100,100}, Rectangle{332,0,100,100},Rectangle{588,0,100,100},Rectangle{844,0,100,100}};
+Rectangle posterSourceRects[] = { Rectangle{76,316,100,100}, Rectangle{332,316,100,100},Rectangle{588,316,100,100},Rectangle{844,316,100,100}};
 
-RayRectangle posterSourceRect = RayRectangle{0,100, 256, 192};
+Rectangle posterSourceRect = Rectangle{0,100, 256, 192};
 
-RayRectangle RECT_TIME 		= RayRectangle{256, 100, 64, 16};
-RayRectangle RECT_LEVEL 		= RayRectangle{320, 100, 150, 30};
-RayRectangle RECT_PLAY 		= RayRectangle{256, 130, 256, 76};
-RayRectangle RECT_PLAY_AGAIN 	= RayRectangle{512, 130, 256, 76};
-RayRectangle RECT_QUIT 		= RayRectangle{768, 130, 256, 76};
-RayRectangle RECT_NONTENDO	 	= RayRectangle{256, 206, 312, 80};
-RayRectangle RECT_2020 		= RayRectangle{256, 286, 112, 30};
-RayRectangle RECT_UNMUTED		= RayRectangle{568, 206, 80, 80};
-RayRectangle RECT_MUTED		= RayRectangle{648, 206, 80, 80};
-RayRectangle RECT_PAUSE		= RayRectangle{768, 206, 256, 76};
+Rectangle RECT_TIME 		= Rectangle{256, 100, 64, 16};
+Rectangle RECT_LEVEL 		= Rectangle{320, 100, 150, 30};
+Rectangle RECT_PLAY 		= Rectangle{256, 130, 256, 76};
+Rectangle RECT_PLAY_AGAIN 	= Rectangle{512, 130, 256, 76};
+Rectangle RECT_QUIT 		= Rectangle{768, 130, 256, 76};
+Rectangle RECT_NONTENDO	 	= Rectangle{256, 206, 312, 80};
+Rectangle RECT_2020 		= Rectangle{256, 286, 112, 30};
+Rectangle RECT_UNMUTED		= Rectangle{568, 206, 80, 80};
+Rectangle RECT_MUTED		= Rectangle{648, 206, 80, 80};
+Rectangle RECT_PAUSE		= Rectangle{768, 206, 256, 76};
 
-RayRectangle RECT_STAR			= RayRectangle{770, 100, 30, 30};
-RayRectangle RECT_TIMES		= RayRectangle{770 + 30, 100, 30, 30};
-RayRectangle RECT_HIGHSCORE= RayRectangle{830, 			100, 133, 15};
-RayRectangle RECT_BIGSCORE= RayRectangle{700, 416, 266, 30};
-RayRectangle RECT_SCORE		= RayRectangle{830 + 63, 100, 70, 15};
+Rectangle RECT_STAR			= Rectangle{770, 100, 30, 30};
+Rectangle RECT_TIMES		= Rectangle{770 + 30, 100, 30, 30};
+Rectangle RECT_HIGHSCORE= Rectangle{830, 			100, 133, 15};
+Rectangle RECT_BIGSCORE= Rectangle{700, 416, 266, 30};
+Rectangle RECT_SCORE		= Rectangle{830 + 63, 100, 70, 15};
 
-RayRectangle RECT_POG_MINI = RayRectangle{963, 100, 30, 30};
-RayRectangle RECT_OGNICK = RayRectangle{0, 416, 100, 100};
-RayRectangle RECT_UPDATE_BUTTON = RayRectangle{300, 416, 312, 80};
-RayRectangle RECT_CURSOR = RayRectangle{612, 416, 88, 88};
+Rectangle RECT_POG_MINI = Rectangle{963, 100, 30, 30};
+Rectangle RECT_OGNICK = Rectangle{0, 416, 100, 100};
+Rectangle RECT_UPDATE_BUTTON = Rectangle{300, 416, 312, 80};
+Rectangle RECT_CURSOR = Rectangle{612, 416, 88, 88};
 
 // Alarm variables #{
 /*										flag						constant
@@ -126,9 +128,9 @@ int cheese_keys[] = {KEY_LEFT_SUPER, KEY_RIGHT_SUPER, KEY_LEFT_ALT, KEY_RIGHT_AL
 #include "operators.hpp"
 #include "gameFuncs.hpp"
 
-RayRectangle RECT_BUTTON[] = { RayRectangle{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304 - 38, 256, 76}, RayRectangle{SCREEN_WIDTH/2 - 128, AREA_HEIGHT/2 - 38, 256, 76} , RayRectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76},
-							RayRectangle{SCREEN_WIDTH - 80 - 8, AREA_HEIGHT + 8, 80, 80}, RayRectangle{SCREEN_WIDTH - 256 - 8, SCREEN_HEIGHT - 76 - 8, 256, 76}, RayRectangle{8, SCREEN_HEIGHT - 76 - 8, 256, 76},
-						 RayRectangle{8 + 16, AREA_HEIGHT + 8, 50, 80} };
+Rectangle RECT_BUTTON[] = { Rectangle{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304 - 38, 256, 76}, Rectangle{SCREEN_WIDTH/2 - 128, AREA_HEIGHT/2 - 38, 256, 76} , Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76},
+							Rectangle{SCREEN_WIDTH - 80 - 8, AREA_HEIGHT + 8, 80, 80}, Rectangle{SCREEN_WIDTH - 256 - 8, SCREEN_HEIGHT - 76 - 8, 256, 76}, Rectangle{8, SCREEN_HEIGHT - 76 - 8, 256, 76},
+						 Rectangle{8 + 16, AREA_HEIGHT + 8, 50, 80} };
 
 #include "button.hpp"
 #include "files.hpp"
@@ -146,7 +148,7 @@ Vector2 EEvector2;
 
 int letterKeys[] = {KEY_A, KEY_B, KEY_C, KEY_D, KEY_E, KEY_F, KEY_G, KEY_H, KEY_I, KEY_J, KEY_K, KEY_L, KEY_M, KEY_N, KEY_O, KEY_P, KEY_Q, KEY_R, KEY_S, KEY_T, KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z} ;
 
-bool GuiTextBoxUpdate(RayRectangle r, char* c, int fontSize, int max_field_length)
+bool GuiTextBoxUpdate(Rectangle r, char* c, int fontSize, int max_field_length)
 {
 	static int hold_counter = 0;
 
@@ -185,13 +187,13 @@ bool GuiTextBoxUpdate(RayRectangle r, char* c, int fontSize, int max_field_lengt
 	return false;
 }
 
-bool GuiTextBoxDraw(RayRectangle r, char* c, int fontSize, int max_field_length)
+bool GuiTextBoxDraw(Rectangle r, char* c, int fontSize, int max_field_length)
 {
 	// draw button
 	DrawRectangleRec(r, RAYWHITE);
 
 	// draw TEXT
-	RayDrawText(c, r.x + 10, r.y + 10, fontSize, NEARBLACK);
+	DrawText(c, r.x + 10, r.y + 10, fontSize, NEARBLACK);
 
 	return false;
 }
@@ -232,7 +234,7 @@ int main(void)
 // check version number w/ server
 	bool needUpdate = false;
 	bool drawUpdateButton = false;
-	RayRectangle updateButtonRect;
+	Rectangle updateButtonRect;
 	std::string downloadURL;
 	CheckVersionJSON(&needUpdate, &drawUpdateButton, &updateButtonRect, &downloadURL);
 	
@@ -245,7 +247,7 @@ int main(void)
 	DisableCursor();
 
 // set window icon
-	Image windowIcon = RayLoadImage("resources/icon.png");
+	Image windowIcon = LoadImage("resources/icon.png");
 	SetWindowIcon(windowIcon);
 
 // prep audio device
@@ -297,16 +299,16 @@ int main(void)
 	// Lose Menu UI
 	bool buttonReturnToMenu = false;
 
-	//RayRectangle buttonStartRect{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304, 256, 76};
-	RayRectangle buttonQuitRect{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76};
+	//Rectangle buttonStartRect{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304, 256, 76};
+	Rectangle buttonQuitRect{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76};
 
 
 	// Pause Menu UI
 	bool buttonResume = false;
 	bool buttonMenu_Pause = false;
 
-	RayRectangle buttonResumeRect{SCREEN_WIDTH/3, SCREEN_HEIGHT/3, 200, 150};
-	RayRectangle buttonMenu_PauseRect{SCREEN_WIDTH/3, 2*SCREEN_HEIGHT/3, 200, 150};
+	Rectangle buttonResumeRect{SCREEN_WIDTH/3, SCREEN_HEIGHT/3, 200, 150};
+	Rectangle buttonMenu_PauseRect{SCREEN_WIDTH/3, 2*SCREEN_HEIGHT/3, 200, 150};
 
 
 	// Graphics Stuff
@@ -317,7 +319,7 @@ int main(void)
 	const Vector2 posterPos = Vector2{SCREEN_WIDTH/2 - (256/2), AREA_HEIGHT};
 
 	/// rect for the area below the play area (bottom bar)
-	const RayRectangle bottomBarRect = RayRectangle{0,AREA_HEIGHT,SCREEN_WIDTH,SCREEN_HEIGHT - AREA_HEIGHT};
+	const Rectangle bottomBarRect = Rectangle{0,AREA_HEIGHT,SCREEN_WIDTH,SCREEN_HEIGHT - AREA_HEIGHT};
 
 
 	// Audio stuff
@@ -365,14 +367,14 @@ int main(void)
 	{		
 		virtualCursorPos = virtualCursorPos + (GetMousePosition() - lastCursorPosition);
 		lastCursorPosition = GetMousePosition();
-		mouseOutOfBounds = !(virtualCursorPos < RayRectangle{0,0,SCREEN_WIDTH, SCREEN_HEIGHT});
+		mouseOutOfBounds = !(virtualCursorPos < Rectangle{0,0,SCREEN_WIDTH, SCREEN_HEIGHT});
 		
 		// check for attempts to break the game
 		for(int i : cheese_keys)
 			if (IsKeyDown(i))
 				pauseFlag = true;
 		
-		// CTRL centers cursor
+		// SHIFT centers cursor
 		if(IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT))
 			virtualCursorPos = Vector2{AREA_WIDTH/2, AREA_HEIGHT/2};
 		
@@ -477,7 +479,7 @@ int main(void)
 		// PAUSE UPDATE
 		if (flags[SET_NAME])
 		{
-			if(GuiTextBoxUpdate(RayRectangle{SCREEN_WIDTH/2 - 100, 5*SCREEN_HEIGHT/6, 200, 100}, player_name_placeholder, 30, 10))
+			if(GuiTextBoxUpdate(Rectangle{SCREEN_WIDTH/2 - 100, 5*SCREEN_HEIGHT/6, 200, 100}, player_name_placeholder, 30, 10))
 			{
 				player_name = player_name_placeholder;
 				if (player_name.length() > 0 && player_name.length() <= 10 && player_name != "REDACTED" && player_name != "[NAME]")
@@ -750,23 +752,23 @@ int main(void)
 				Color col = RAYWHITE;
 
 				// when the user clicks the name it brings them back to the name screen
-				if(HiddenButton(RayRectangle{SCREEN_WIDTH/2 - 135, 50, 200, 30}))
+				if(HiddenButton(Rectangle{SCREEN_WIDTH/2 - 135, 50, 200, 30}))
 				{
 					strcpy(player_name_placeholder,"\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
 					player_name = "";
 					flags[SET_NAME] = true;
 				}
 
-				if (virtualCursorPos < RayRectangle{SCREEN_WIDTH/2 - 135, 50, 200, 30})
+				if (virtualCursorPos < Rectangle{SCREEN_WIDTH/2 - 135, 50, 200, 30})
 				{
 					col = RED;
-					RayDrawText("CLICK to change name! (please don't abuse this)", SCREEN_WIDTH/2 - 240, 90, 20, col);
+					DrawText("CLICK to change name! (please don't abuse this)", SCREEN_WIDTH/2 - 240, 90, 20, col);
 				}
 
 				DrawTextCentered(player_name_placeholder, SCREEN_WIDTH/2, 50, 40, col);
 
 				// when the user clicks the poster it will play a sound effect
-				if(HiddenButton(RayRectangle{AREA_WIDTH/2 - 128, AREA_HEIGHT/2 - 96 - 48, 256, 192}))
+				if(HiddenButton(Rectangle{AREA_WIDTH/2 - 128, AREA_HEIGHT/2 - 96 - 48, 256, 192}))
 				{
 					// play a random nick sound
 					int i = rand() % 4;
@@ -795,16 +797,16 @@ int main(void)
 			if (flags[SET_NAME])
 			{
 				ClearBackground(NEARBLACK);
-				RayDrawText("Welcome to\n\"The Many Faces of Nicktober\"\nAKA \"NICK GAME!\n\n\nTo get started you need to choose a name\nthat your scores will be listed under.\n\nPlease put a name the NICKTOBER admins can Identify you by\nand one that you'll be okay with other people seeing :eyes:", 80, 100, 20, RAYWHITE);
+				DrawText("Welcome to\n\"The Many Faces of Nicktober\"\nAKA \"NICK GAME!\n\n\nTo get started you need to choose a name\nthat your scores will be listed under.\n\nPlease put a name the NICKTOBER admins can Identify you by\nand one that you'll be okay with other people seeing :eyes:", 80, 100, 20, RAYWHITE);
 
-				GuiTextBoxDraw(RayRectangle{140, 5*SCREEN_HEIGHT/6, 520, 80}, player_name_placeholder, 63, 10);
+				GuiTextBoxDraw(Rectangle{140, 5*SCREEN_HEIGHT/6, 520, 80}, player_name_placeholder, 63, 10);
 
 				if (name_error[0])
-					RayDrawText("Please keep the name at 10 characters or less :cowboy:", SCREEN_WIDTH/2 - 100, 5*SCREEN_HEIGHT/6 + 100, 10, PINK);
+					DrawText("Please keep the name at 10 characters or less :cowboy:", SCREEN_WIDTH/2 - 100, 5*SCREEN_HEIGHT/6 + 100, 10, PINK);
 				else if (name_error[1])
-					RayDrawText("I can pretty much guarantee that's not your name :fax:", SCREEN_WIDTH/2 - 100, 5*SCREEN_HEIGHT/6 + 100, 10, PINK);
+					DrawText("I can pretty much guarantee that's not your name :fax:", SCREEN_WIDTH/2 - 100, 5*SCREEN_HEIGHT/6 + 100, 10, PINK);
 				else if (name_error[2])
-					RayDrawText("Placeholder error :nduronPog:", SCREEN_WIDTH/2 - 100, 5*SCREEN_HEIGHT/6 + 100, 10, PINK);
+					DrawText("Placeholder error :nduronPog:", SCREEN_WIDTH/2 - 100, 5*SCREEN_HEIGHT/6 + 100, 10, PINK);
 			}
 			else if(level == 0)
 			{
@@ -817,7 +819,7 @@ int main(void)
 				}
 				
 				ClearBackground(NEARBLACK);
-				//DrawRectangleRec(RayRectangle{150,0,SCREEN_WIDTH - 300,SCREEN_HEIGHT}, BLACK);
+				//DrawRectangleRec(Rectangle{150,0,SCREEN_WIDTH - 300,SCREEN_HEIGHT}, BLACK);
 				DrawTextureRec(atlas, posterSourceRect, Vector2{AREA_WIDTH/2 - 128, AREA_HEIGHT/2 - 96 - 48}, RAYWHITE);
 				int time = static_cast<int>(GetTime()) % 12;
 
@@ -855,13 +857,13 @@ int main(void)
 				
 				buttonQuit = ImageButton(atlas, QUIT);
 				
-				if (drawUpdateButton && ImageButtonEx(RayRectangle{SCREEN_WIDTH/2 - 154,360, 312,80}, atlas, RECT_UPDATE_BUTTON))
+				if (drawUpdateButton && ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 154,360, 312,80}, atlas, RECT_UPDATE_BUTTON))
 				{
 					OpenURL(downloadURL.c_str());
 				}
 				
-				if(virtualCursorPos < RayRectangle{SCREEN_WIDTH/2 - 120, SCREEN_HEIGHT - 85, 200 + 40, 60})
-					RayDrawText("MASTER VOLUME", SCREEN_WIDTH/2 - 90, SCREEN_HEIGHT - 105, 20, BLUE);
+				if(virtualCursorPos < Rectangle{SCREEN_WIDTH/2 - 120, SCREEN_HEIGHT - 85, 200 + 40, 60})
+					DrawText("MASTER VOLUME", SCREEN_WIDTH/2 - 90, SCREEN_HEIGHT - 105, 20, BLUE);
 				SliderBarCenter(Vector2{SCREEN_WIDTH/2, SCREEN_HEIGHT - 55}, 200, &volumePercent);
 
 			}/*}#*/
@@ -894,8 +896,8 @@ int main(void)
 						allTargets.clear();
 					}
 					
-					if(virtualCursorPos < RayRectangle{SCREEN_WIDTH/2 - 120, SCREEN_HEIGHT - 85, 200 + 40, 60})
-						RayDrawText("MASTER VOLUME", SCREEN_WIDTH/2 - 90, SCREEN_HEIGHT - 105, 20, BLUE);
+					if(virtualCursorPos < Rectangle{SCREEN_WIDTH/2 - 120, SCREEN_HEIGHT - 85, 200 + 40, 60})
+						DrawText("MASTER VOLUME", SCREEN_WIDTH/2 - 90, SCREEN_HEIGHT - 105, 20, BLUE);
 					SliderBarCenter(Vector2{SCREEN_WIDTH/2, SCREEN_HEIGHT - 55}, 200, &volumePercent);
 				}
 				// LOSE DRAW
@@ -934,11 +936,11 @@ int main(void)
 						DrawTextureRec(atlas, RECT_TIMES, Vector2{AREA_WIDTH/2 - 45,  (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
 	
 						// draw player's name
-						//RayDrawText((std::to_string(myLeaderboardPosition) + ".").c_str(), 10, 14*(SCREEN_HEIGHT - 228)/18 + 15, 35, LIGHTGRAY);
-						//RayDrawText(myScore.first.c_str(), 40, 14*(SCREEN_HEIGHT - 228)/18 + 15, 35, LIGHTGRAY);
+						//DrawText((std::to_string(myLeaderboardPosition) + ".").c_str(), 10, 14*(SCREEN_HEIGHT - 228)/18 + 15, 35, LIGHTGRAY);
+						//DrawText(myScore.first.c_str(), 40, 14*(SCREEN_HEIGHT - 228)/18 + 15, 35, LIGHTGRAY);
 						
-						RayDrawText((std::to_string(scoreCounter + 1) + ".").c_str(), 10, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
-						RayDrawText(iter->first.c_str(), 40, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
+						DrawText((std::to_string(scoreCounter + 1) + ".").c_str(), 10, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
+						DrawText(iter->first.c_str(), 40, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
 
 						// draw the scores using DrawNumberAt
 						DrawNumberAtLeftJustified(atlas, iter->second, Vector2{AREA_WIDTH/2, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18});
@@ -988,15 +990,15 @@ int main(void)
 						DrawNumberAtLeftJustified(atlas, myBestScore.second, Vector2{AREA_WIDTH/2, 14*(SCREEN_HEIGHT - 228)/18});
 						
 						// BEST ROUND label
-						RayDrawText("BEST ROUND", 550, 14*(SCREEN_HEIGHT - 228)/18 + 20, 20, LIGHTGRAY);
+						DrawText("BEST ROUND", 550, 14*(SCREEN_HEIGHT - 228)/18 + 20, 20, LIGHTGRAY);
 					}
 					
 					int _xOff = (myLeaderboardPosition > 20) ? 20 : ((myLeaderboardPosition > 11) ? 15 : 0);
 					int _yOff = (myScoreIsInTheTopFiveFuckYes) ? 2 : 0;
 					
 					// draw your name
-					RayDrawText((std::to_string(myLeaderboardPosition) + ".").c_str(), 10, (14 + _yOff)*(SCREEN_HEIGHT - 228)/18 + 15, 35, LIGHTGRAY);
-					RayDrawText(myScore.first.c_str(), 40 + _xOff, (14 + _yOff)*(SCREEN_HEIGHT - 228)/18 + 15, 35, LIGHTGRAY);
+					DrawText((std::to_string(myLeaderboardPosition) + ".").c_str(), 10, (14 + _yOff)*(SCREEN_HEIGHT - 228)/18 + 15, 35, LIGHTGRAY);
+					DrawText(myScore.first.c_str(), 40 + _xOff, (14 + _yOff)*(SCREEN_HEIGHT - 228)/18 + 15, 35, LIGHTGRAY);
 					
 					
 					// draw stars & the times symbol (for THIS ROUND)
@@ -1007,35 +1009,35 @@ int main(void)
 					DrawNumberAtLeftJustified(atlas, myScore.second, Vector2{AREA_WIDTH/2, 16*(SCREEN_HEIGHT - 228)/18});
 					
 					// THIS ROUND label;
-					RayDrawText("THIS ROUND", 550, 16*(SCREEN_HEIGHT - 228)/18 + 20, 20, LIGHTGRAY);
+					DrawText("THIS ROUND", 550, 16*(SCREEN_HEIGHT - 228)/18 + 20, 20, LIGHTGRAY);
 
-					buttonStart = ImageButtonEx(RayRectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*3, 256, 76}, atlas, RECT_PLAY_AGAIN);
-					buttonReturnToMenu = ImageButtonEx(RayRectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*2, 256, 76}, atlas, RECT_QUIT);
+					buttonStart = ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*3, 256, 76}, atlas, RECT_PLAY_AGAIN);
+					buttonReturnToMenu = ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*2, 256, 76}, atlas, RECT_QUIT);
 
 					// show full leaderboard button
 					Color _col = RAYWHITE;
-					if (virtualCursorPos < RayRectangle{SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT - 50, 400, 40}) _col = SKYBLUE;
-					RayDrawTextEx(gameboyFont, "SEE FULL LEADERBOARD", Vector2{SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT - 50}, 25, 1.0, _col);
-					if (HiddenButton(RayRectangle{SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT - 50, 400, 40}))
+					if (virtualCursorPos < Rectangle{SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT - 50, 400, 40}) _col = SKYBLUE;
+					DrawTextEx(gameboyFont, "SEE FULL LEADERBOARD", Vector2{SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT - 50}, 25, 1.0, _col);
+					if (HiddenButton(Rectangle{SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT - 50, 400, 40}))
 						OpenURL("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/leaderboard.php");
 
 					// flavor text
-					if (nicktoberNamesOnly && virtualCursorPos < RayRectangle{0,0,100,100})
-						RayDrawText("SHOW ALL SCORES", 105, 80, 12, RAYWHITE);
-					else if (!nicktoberNamesOnly && virtualCursorPos < RayRectangle{0,0,100,100})
-						RayDrawText("SHOW NICKTOBER SCORES", 105, 80, 12, RAYWHITE);
+					if (nicktoberNamesOnly && virtualCursorPos < Rectangle{0,0,100,100})
+						DrawText("SHOW ALL SCORES", 105, 80, 12, RAYWHITE);
+					else if (!nicktoberNamesOnly && virtualCursorPos < Rectangle{0,0,100,100})
+						DrawText("SHOW NICKTOBER SCORES", 105, 80, 12, RAYWHITE);
 
 					// toggle nicktober button
-					if (nicktoberNamesOnly && ImageButtonEx(RayRectangle{0,0,100,100}, atlas, RECT_OGNICK))
+					if (nicktoberNamesOnly && ImageButtonEx(Rectangle{0,0,100,100}, atlas, RECT_OGNICK))
 						nicktoberNamesOnly = false;
-					else if (!nicktoberNamesOnly && ImageButtonEx(RayRectangle{0,0,100,100}, atlas, criminalPosterRects[2]))
+					else if (!nicktoberNamesOnly && ImageButtonEx(Rectangle{0,0,100,100}, atlas, criminalPosterRects[2]))
 						nicktoberNamesOnly = true;
 				}
 				// PREROUND DRAW
 				else if (flags[PREROUND])
 				{
 					ClearBackground(NEARBLACK);
-					RayRectangle r;
+					Rectangle r;
 
 					if (level % 2 == 0)
 					{
@@ -1093,7 +1095,7 @@ int main(void)
 						DrawTarget(allTargets[0], atlas);
 					}
 
-					RayRectangle r = allTargets[0].getSpriteRect();
+					Rectangle r = allTargets[0].getSpriteRect();
 
 					#ifdef USE_DS_STYLE
 					// DS version (uses a faces_alt)
@@ -1118,7 +1120,7 @@ int main(void)
 
 					// draw miss text if the TARGET_MISSED still be goin
 					if (flags[TARGET_MISSED])
-						RayDrawText("-10", highlightTextOrigin.x - 32, highlightTextOrigin.y - 32, 48, RAYWHITE);
+						DrawText("-10", highlightTextOrigin.x - 32, highlightTextOrigin.y - 32, 48, RAYWHITE);
 
 					if (EEbool2 && (flags[TARGET_HIGHLIGHT] || flags[COUNTUP]))
 						DrawTextCentered("fuck you simon", EEvector2.x, EEvector2.y, 15, NEARBLACK);
@@ -1160,9 +1162,9 @@ int main(void)
 			if (mouseOutOfBounds)
 				DrawTextCentered("PRESS SHIFT TO CENTER CURSOR", SCREEN_WIDTH/2, 40, 15, RAYWHITE);
 			
-			// RayDrawText((std::to_string(virtualCursorPos.x) + ", " + std::to_string(virtualCursorPos.y)).c_str(), 0, 0, 20, RAYWHITE);
-			// RayDrawText(std::to_string(virtualCursorPos.x).c_str(), 0, 0, 10, RAYWHITE);
-			// RayDrawText((", " + std::to_string(virtualCursorPos.y)).c_str(), 75, 0, 10, RAYWHITE);
+			// DrawText((std::to_string(virtualCursorPos.x) + ", " + std::to_string(virtualCursorPos.y)).c_str(), 0, 0, 20, RAYWHITE);
+			// DrawText(std::to_string(virtualCursorPos.x).c_str(), 0, 0, 10, RAYWHITE);
+			// DrawText((", " + std::to_string(virtualCursorPos.y)).c_str(), 75, 0, 10, RAYWHITE);
 
 		EndDrawing();
 		//----------------------------------------------------------------------------------
@@ -1171,7 +1173,7 @@ int main(void)
 	// De-Initialization
 	//--------------------------------------------------------------------------------------
 	CloseAudioDevice();
-	RayCloseWindow();        // Close window and OpenGL context
+	CloseWindow();        // Close window and OpenGL context
 	//--------------------------------------------------------------------------------------
 
 	return 0;
