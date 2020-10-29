@@ -432,15 +432,25 @@ void DrawTarget(target t, Texture2D facesSmallTexture)
 
 Rectangle GetDigitRect(int digit)
 {
-	return Rectangle{470 + (digit * 30), 100, 30, 30};
+	return Rectangle{470 + ((float)digit * 30), 100, 30, 30};
 }
 
 void tickSeconds(int& seconds, int& frames, int level)
 {
 	// extra ticks for higher levels
-	if (level > 100) frames--;
-	else if (level > 75) if (frames % 2 == 0) frames--;
-	else if (level > 50) if (frames % 3 == 0) frames--;
+	// NOTE: these if/else statements were expanded to have {} to quell an error. DO NOT SIMPLIFY AGAIN!
+	if (level > 100)
+	{
+		frames--;
+	}
+	else if (level > 75)
+	{
+		if (frames % 2 == 0) frames--;
+	}
+	else if (level > 50)
+	{
+		if (frames % 3 == 0) frames--;
+	}
 		
 	frames--;
 	if (frames <= 1)
@@ -460,6 +470,10 @@ void tickSeconds(int& seconds, int& frames, int level)
 int AlarmDuration(GAME_FLAG f)
 {
 	int a = FPS_TARGET;
+	
+	// cases not handled:
+	// GAME_IN_PLAY, FLAG_MUTE, GAME_PAUSED, LOSE_SCREEN, SET_NAME
+	// (all of these do not have associated alarms and are only used as flags.)
 	switch (f)
 	{
 		case PREROUND:
@@ -482,6 +496,9 @@ int AlarmDuration(GAME_FLAG f)
 			break;
 		case LOSE_TIMER:
 			a *= LOSE_TIMER_DURATION;
+			break;
+		default:
+			a = FPS_TARGET;
 			break;
 	}
 

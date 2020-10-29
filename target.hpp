@@ -20,17 +20,20 @@ struct target_template
 class target
 {
 	// standard attributes
-	MoveAI movementType;
 	Vector2 position;		/// starting position of the target
-	bool _isWanted;			/// determines if this particular target is the win condition on the level.
-	bool isMenuTarget;		/// targets created only for display purposes, they will wrap on screen boundaries instead of area boundaries
-
-	//float sinPeriod;
-	float sinAmplitude;
+	MoveAI movementType;
+	
 	Direction dir;
 	double angle;	// TODO write an access method that makes sure this shit is always radians o.O
 	float speed;
 
+	bool _isWanted;			/// determines if this particular target is the win condition on the level.
+	
+	float sinAmplitude;
+	bool isMenuTarget;		/// targets created only for display purposes, they will wrap on screen boundaries instead of area boundaries
+
+	//float sinPeriod;
+	
 	Rectangle spriteRect;
 
 	// update methods
@@ -85,21 +88,14 @@ public:
 };/*}#*/
 
 // constructor definitions for class target/*#{*/
-target::target(float x, float y, MoveAI movetype, bool wanted): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
-{
-	setPos(x, y);
-	setMoveType(movetype);
-	setWanted(wanted);
-}
+target::target(float x, float y, MoveAI movetype, bool wanted):
+position{Vector2{x,y}},movementType{movetype}, _isWanted{wanted},
+sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false} {}
 
-target::target(float x, float y, MoveAI movetype,Direction direction, bool wanted): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
+target::target(float x, float y, MoveAI movetype,Direction direction, bool wanted):
+position{Vector2{x,y}}, movementType{movetype}, dir{direction}, speed{BASE_SPEED},
+_isWanted{wanted}, sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
-	setPos(x, y);
-	setMoveType(movetype);
-	setWanted(wanted);
-	dir = direction;
-	speed = BASE_SPEED;
-
 	if (movetype == DIRECTION_4)
 	{
 		if (dir == Down) setAngle(3 * PI / 2);
@@ -109,7 +105,8 @@ target::target(float x, float y, MoveAI movetype,Direction direction, bool wante
 	}
 }
 
-target::target(float x, float y, MoveAI movetype, double angle,bool wanted): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
+target::target(float x, float y, MoveAI movetype, double angle,bool wanted):
+sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(x,y);
 	setMoveType(movetype);
@@ -120,7 +117,8 @@ target::target(float x, float y, MoveAI movetype, double angle,bool wanted): sin
 	speed = BASE_SPEED;
 }
 
-target::target(float x, float y, MoveAI movetype, double angle,float speed): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
+target::target(float x, float y, MoveAI movetype, double angle,float speed):
+sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(x,y);
 	setMoveType(movetype);
@@ -130,7 +128,8 @@ target::target(float x, float y, MoveAI movetype, double angle,float speed): sin
 	setSpeed(speed);
 }
 
-target::target(Vector2 pos, MoveAI movetype, double angle,float speed): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
+target::target(Vector2 pos, MoveAI movetype, double angle,float speed):
+sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(pos);
 	setMoveType(movetype);
@@ -140,7 +139,8 @@ target::target(Vector2 pos, MoveAI movetype, double angle,float speed): sinAmpli
 	setSpeed(speed);
 }
 
-target::target(Vector2 pos, MoveAI movetype, double angle,float speed, Rectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
+target::target(Vector2 pos, MoveAI movetype, double angle,float speed, Rectangle spriteRect):
+sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(pos);
 	setMoveType(movetype);
@@ -151,7 +151,8 @@ target::target(Vector2 pos, MoveAI movetype, double angle,float speed, Rectangle
 	setSpriteRect(spriteRect);
 }
 
-target::target(Vector2 pos, target_template t): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
+target::target(Vector2 pos, target_template t): sinAmplitude{BASE_SIN_AMPLITUDE}
+,isMenuTarget{false}
 {
 	setPos(pos);
 	setMoveType(t.movetype);
@@ -163,7 +164,8 @@ target::target(Vector2 pos, target_template t): sinAmplitude{BASE_SIN_AMPLITUDE}
 	setSpriteRect(t.rect);
 }
 
-target::target(Vector2 pos, Rectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
+target::target(Vector2 pos, Rectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE}
+,isMenuTarget{false}
 {
 	setPos(pos);
 

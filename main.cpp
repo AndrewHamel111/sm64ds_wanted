@@ -299,20 +299,12 @@ int main(void)
 	// Lose Menu UI
 	bool buttonReturnToMenu = false;
 
-	//Rectangle buttonStartRect{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304, 256, 76};
-	Rectangle buttonQuitRect{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76};
-
-
 	// Pause Menu UI
-	bool buttonResume = false;
-	bool buttonMenu_Pause = false;
-
-	Rectangle buttonResumeRect{SCREEN_WIDTH/3, SCREEN_HEIGHT/3, 200, 150};
-	Rectangle buttonMenu_PauseRect{SCREEN_WIDTH/3, 2*SCREEN_HEIGHT/3, 200, 150};
 
 
 	// Graphics Stuff
-	int textureIndex = 0;
+	// TO BE REIMPLEMENTED
+	//int textureIndex = 0;
 	Texture2D atlas = LoadTexture("resources/textures/atlas0.png");
 
 	/// position for the vector on screen
@@ -323,7 +315,6 @@ int main(void)
 
 
 	// Audio stuff
-	
 	std::vector<std::vector<Sound>> character_sounds;
 	std::vector<std::vector<Sound>> sound_effects;
 	std::vector<Music> bgm;
@@ -359,7 +350,6 @@ int main(void)
 
 	//--------------------------------------------------------------------------------------
 
-	bool TESTFLAG = true;
 	bool name_error[3] = {false};
 
 	// Main game loop
@@ -632,7 +622,8 @@ int main(void)
 								flags[GAME_IN_PLAY] = false;
 
 								int i;
-								float j;
+								float j = 1.0f;
+								// TODO replace this with a system to calculate the duration of each sound effect
 								if (allTargets[0].getSpriteRect() == criminalPosterRects[RECT_ONE])
 								{
 									i = rand() % character_sounds[0].size();
@@ -905,8 +896,7 @@ int main(void)
 				{
 					ClearBackground(NEARBLACK);
 					score_pair myScore = make_pair(player_name, (level > 0) ? level - 1 : 0);
-					bool _p = true;
-
+					
 					// HIGH SCORE text
 					DrawTextureRec(atlas, RECT_BIGSCORE, Vector2{AREA_WIDTH/2 - 133, 30}, WHITE);
 
@@ -931,31 +921,30 @@ int main(void)
 						else if (scoreCounter == 2) col = Color{ 153, 109, 38, 255 };	// BRONZE
 						else col = LIGHTGRAY;
 
+						float sc = (float)scoreCounter;
+
 						// draw stars & the times symbol
-						DrawTextureRec(atlas, RECT_STAR,  Vector2{AREA_WIDTH/2 - 75, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
-						DrawTextureRec(atlas, RECT_TIMES, Vector2{AREA_WIDTH/2 - 45,  (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
+						DrawTextureRec(atlas, RECT_STAR,  Vector2{AREA_WIDTH/2 - 75, (2*sc + 3)*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
+						DrawTextureRec(atlas, RECT_TIMES, Vector2{AREA_WIDTH/2 - 45,  (2*sc + 3)*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
 	
 						// draw player's name
-						//DrawText((std::to_string(myLeaderboardPosition) + ".").c_str(), 10, 14*(SCREEN_HEIGHT - 228)/18 + 15, 35, LIGHTGRAY);
-						//DrawText(myScore.first.c_str(), 40, 14*(SCREEN_HEIGHT - 228)/18 + 15, 35, LIGHTGRAY);
 						
-						DrawText((std::to_string(scoreCounter + 1) + ".").c_str(), 10, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
-						DrawText(iter->first.c_str(), 40, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
+						DrawText((std::to_string(sc + 1) + ".").c_str(), 10, (2*sc + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
+						DrawText(iter->first.c_str(), 40, (2*sc + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
 
 						// draw the scores using DrawNumberAt
-						DrawNumberAtLeftJustified(atlas, iter->second, Vector2{AREA_WIDTH/2, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18});
+						DrawNumberAtLeftJustified(atlas, iter->second, Vector2{AREA_WIDTH/2, (2*sc + 3)*(SCREEN_HEIGHT - 228)/18});
 
 						// when it's "your" score it renders a special icon on the right
 						if (myScore.first == iter->first)
 						{
 							myScoreIsInTheTopFiveFuckYes = true;
 							
-							_p = false;
-							int xOff = 20;
+							float xOff = 20.0f;
 							if (iter->second > 999) xOff += 30;
 							if (iter->second > 99) xOff += 30;
 							if (iter->second > 9) xOff += 30;
-							DrawTextureRec(atlas, RECT_POG_MINI, Vector2{AREA_WIDTH/2 + xOff, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
+							DrawTextureRec(atlas, RECT_POG_MINI, Vector2{AREA_WIDTH/2 + xOff, (2*sc + 3)*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
 						}
 
 						lowestHighScore = *iter;

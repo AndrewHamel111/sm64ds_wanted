@@ -105,9 +105,9 @@ bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 	{
 		bounds = RECT_BUTTON[SKIP];
 		Color c = LIME;
-		bool q = false, p = false;
+		bool q = false, p = (Vector2{virtualCursorPos.x, virtualCursorPos.y} < bounds);
 
-		if (p = (Vector2{virtualCursorPos.x, virtualCursorPos.y} < bounds))
+		if (p)
 		{
 			// change render color of button
 			c = WHITE;
@@ -118,6 +118,7 @@ bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 		DrawTextureRec(atlas, RECT_UNMUTED, Vector2{bounds.x,bounds.y}, c);
 		if (p)
 		{
+			// TODO consider moving this text to below the icon
 			DrawText("SKIP", bounds.x + 11, bounds.y + 30, 8, RAYWHITE);
 			DrawText("SONG", bounds.x + 9, bounds.y + 38, 8, RAYWHITE);
 		}
