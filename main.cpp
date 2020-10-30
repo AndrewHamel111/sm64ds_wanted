@@ -68,28 +68,9 @@ Rectangle RECT_OGNICK = Rectangle{0, 416, 100, 100};
 Rectangle RECT_UPDATE_BUTTON = Rectangle{300, 416, 312, 80};
 Rectangle RECT_CURSOR = Rectangle{612, 416, 88, 88};
 
-// Alarm variables #{
-/*										flag						constant
-alarm[0] -	EMPTY ALARM
-alarm[1] -	preRoundAlarm				|	preRoundFlag			|	PREROUND_ALARM_DURATION
-alarm[2] -	drumrollAlarm				|	drumrollFlag			|	DRUMROLL_ALARM_DURATION
-alarm[3] - 	targetMissedAlarm			|	targetMissedFlag		|	TARGET_MISSED_ALARM_DURATION
-alarm[4] -	targetHighlightAlarm		|	targetHighlightFlag		|	TARGET_HIGHLIGHT_DURATION
-alarm[5] -	roundBuffer
-alarm[6] -	scoreCountupAlarm
-alarm[7] -	loseAlarm
-alarm[8] -
-alarm[9] -
-}#		*/
+
 int alarm[ALARMFLAG_COUNT] = {0};	// linked with flags by enum GAME_FLAG
 
-// flags
-// preRoundFlag = false;
-// drumrollFlag = false;		// TODO To Be Implemented
-// targetMissedFlag = false;	// TODO To Be Implemented
-// targetHighlightFlag = false;
-// roundTimeDepletedFlag = false;
-// scoreCountupFlag
 bool flags[ALARMFLAG_COUNT] = {false};// linked with alarms by enum GAME_FLAG
 
 // counter[0] - used for countup
@@ -921,19 +902,19 @@ int main(void)
 						else if (scoreCounter == 2) col = Color{ 153, 109, 38, 255 };	// BRONZE
 						else col = LIGHTGRAY;
 
-						float sc = (float)scoreCounter;
+						//float sc = static_cast<float>(scoreCounter);
 
 						// draw stars & the times symbol
-						DrawTextureRec(atlas, RECT_STAR,  Vector2{AREA_WIDTH/2 - 75, (2*sc + 3)*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
-						DrawTextureRec(atlas, RECT_TIMES, Vector2{AREA_WIDTH/2 - 45,  (2*sc + 3)*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
+						DrawTextureRec(atlas, RECT_STAR,  Vector2{AREA_WIDTH/2 - 75, (float)((2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15)}, WHITE);
+						DrawTextureRec(atlas, RECT_TIMES, Vector2{AREA_WIDTH/2 - 45,  (float)((2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15)}, WHITE);
 	
 						// draw player's name
 						
-						DrawText((std::to_string(sc + 1) + ".").c_str(), 10, (2*sc + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
-						DrawText(iter->first.c_str(), 40, (2*sc + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
+						DrawText((std::to_string(scoreCounter + 1) + ".").c_str(), 10, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
+						DrawText(iter->first.c_str(), 40, (2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15, 35, col);
 
 						// draw the scores using DrawNumberAt
-						DrawNumberAtLeftJustified(atlas, iter->second, Vector2{AREA_WIDTH/2, (2*sc + 3)*(SCREEN_HEIGHT - 228)/18});
+						DrawNumberAtLeftJustified(atlas, iter->second, Vector2{AREA_WIDTH/2, (float)((2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18)});
 
 						// when it's "your" score it renders a special icon on the right
 						if (myScore.first == iter->first)
@@ -944,7 +925,7 @@ int main(void)
 							if (iter->second > 999) xOff += 30;
 							if (iter->second > 99) xOff += 30;
 							if (iter->second > 9) xOff += 30;
-							DrawTextureRec(atlas, RECT_POG_MINI, Vector2{AREA_WIDTH/2 + xOff, (2*sc + 3)*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
+							DrawTextureRec(atlas, RECT_POG_MINI, Vector2{AREA_WIDTH/2 + xOff, (float)((2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15)}, WHITE);
 						}
 
 						lowestHighScore = *iter;

@@ -119,9 +119,6 @@ void LoadSounds(std::vector<std::vector<Sound>>* character_sounds, std::vector<s
 	
 	bgm->clear();
 	
-	// TODO consider removing this sad excuse for an idea
-	//std::vector<std::vector<Sound>>* currentVector;
-	
 	for(int i = 0; i < 7; i++)
 	{
 		if (i < 4)
@@ -143,9 +140,6 @@ void LoadSounds(std::vector<std::vector<Sound>>* character_sounds, std::vector<s
 	int _sz = files[7].size();
 	for(int i = 0; i < _sz; i++)
 		bgm->push_back(LoadMusicStream(files[7][i].c_str()));
-	
-	// TODO remove this debug scum
-	//std::cout<< "stale cum" << std::endl;
 }
 
 void GetNames(std::vector<std::string>& names)
