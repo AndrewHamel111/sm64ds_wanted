@@ -7,12 +7,12 @@ struct target_template
 	MoveAI movetype;
 	double angle;
 	float speed;
-	Rectangle rect;
+	int rect;
 
-	target_template(Rectangle r): movetype{STATIONARY}, angle{0}, speed{0}, rect{r}
+	target_template(int r): movetype{STATIONARY}, angle{0}, speed{0}, rect{r}
 	{}
 
-	target_template(MoveAI m, double a, float s, Rectangle r): movetype{m}, angle{a}, speed{s}, rect{r}
+	target_template(MoveAI m, double a, float s, int r): movetype{m}, angle{a}, speed{s}, rect{r}
 	{}
 };
 
@@ -24,7 +24,7 @@ class target
 	MoveAI movementType;
 	
 	Direction dir;
-	double angle;	// TODO write an access method that makes sure this shit is always radians o.O
+	double angle;
 	float speed;
 
 	bool _isWanted;			/// determines if this particular target is the win condition on the level.
@@ -34,7 +34,9 @@ class target
 
 	//float sinPeriod;
 	
-	Rectangle spriteRect;
+	// TOOD replace with SPRITE_RECT_ENUM values
+	int spriteRect;
+	//Rectangle spriteRect;
 
 	// update methods
 	void move(double);
@@ -48,10 +50,10 @@ public:
 	target(float x, float y, MoveAI movetype, double angle,bool wanted);
 	target(float x, float y, MoveAI movetype, double angle,float speed);
 	target(Vector2 pos, MoveAI movetype, double angle,float speed);
-	target(Vector2 pos, MoveAI movetype, double angle,float speed, Rectangle spriteRect);
+	target(Vector2 pos, MoveAI movetype, double angle,float speed, int spriteRect);
 
 	target(Vector2 pos, target_template t);
-	target(Vector2 pos, Rectangle spriteRect);
+	target(Vector2 pos, int spriteRect);
 
 	// access methods
 	void setMoveType(MoveAI);
@@ -69,7 +71,7 @@ public:
 
 	void setSpeed(float);
 
-	void setSpriteRect(Rectangle);
+	void setSpriteRect(int);
 
 	MoveAI getMoveType() const;
 
@@ -81,7 +83,8 @@ public:
 	bool isWanted() const;
 	bool isMenu() const;
 
-	Rectangle getSpriteRect() const;
+	int getSpriteRect() const;
+	//Rectangle getSpriteRect() const;
 
 	// update methods
 	void update(double);
@@ -92,6 +95,11 @@ target::target(float x, float y, MoveAI movetype, bool wanted):
 position{Vector2{x,y}},movementType{movetype}, _isWanted{wanted},
 sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false} {}
 
+/**
+*
+*	@param x starting x position of target.
+*	@param y starting y position of target.
+*/
 target::target(float x, float y, MoveAI movetype,Direction direction, bool wanted):
 position{Vector2{x,y}}, movementType{movetype}, dir{direction}, speed{BASE_SPEED},
 _isWanted{wanted}, sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
@@ -139,7 +147,7 @@ sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 	setSpeed(speed);
 }
 
-target::target(Vector2 pos, MoveAI movetype, double angle,float speed, Rectangle spriteRect):
+target::target(Vector2 pos, MoveAI movetype, double angle,float speed, int spriteRect):
 sinAmplitude{BASE_SIN_AMPLITUDE} ,isMenuTarget{false}
 {
 	setPos(pos);
@@ -164,7 +172,7 @@ target::target(Vector2 pos, target_template t): sinAmplitude{BASE_SIN_AMPLITUDE}
 	setSpriteRect(t.rect);
 }
 
-target::target(Vector2 pos, Rectangle spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE}
+target::target(Vector2 pos, int spriteRect): sinAmplitude{BASE_SIN_AMPLITUDE}
 ,isMenuTarget{false}
 {
 	setPos(pos);
@@ -248,7 +256,7 @@ void target::setSpeed(float speed)
 	this->speed = speed;
 }
 
-void target::setSpriteRect(Rectangle rect)
+void target::setSpriteRect(int rect)
 {
 	this->spriteRect = rect;
 }
@@ -290,7 +298,7 @@ bool target::isMenu() const
 	return isMenuTarget;
 }
 
-Rectangle target::getSpriteRect() const
+int target::getSpriteRect() const
 {
 	return spriteRect;
 }
@@ -418,28 +426,6 @@ bool operator==(const Rectangle& lhs, const Rectangle& rhs)
 	return lhs.x == rhs.x; // && lhs.y == rhs.y;
 }
 
-/// deprecated: moved to gameFuncs.h as a static function
-/*
-void target::DrawTarget()
-{
-	// color based on sprite version
-	Color col;
-	if (spriteRect == spriteRects[0]) // RECT_ONE
-		col = GOLD;
-	else if (spriteRect == spriteRects[1]) // RECT_TWO
-		col = ORANGE;
-	else if (spriteRect == spriteRects[2]) // RECT_THREE
-		col = SKYBLUE;
-	else if (spriteRect == spriteRects[3]) // RECT_FOUR
-		col = LIME;
-	else
-		col = BLACK;
-
-	DrawRectangle(position.x, position.y, 100, 100, col);
-	Vector2 temp = getCenter();
-	DrawRectangle(temp.x, temp.y, 5,5, BLACK);
-}
-*/
 /*}#*/
 
 #endif

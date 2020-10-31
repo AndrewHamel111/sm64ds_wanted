@@ -5,7 +5,7 @@ enum Direction { Right, Down, Left, Up };
 
 enum MoveAI
 {
-    STATIONARY,
+    STATIONARY = 0,
     DIRECTION_4,
     DIRECTION_ANGLE,
 	DIRECTION_ANGLE_W_BOUNCE,
@@ -14,15 +14,15 @@ enum MoveAI
 
 enum SpriteRectEnum
 {
-	RECT_ONE,	// Rectangle{0,0,100,100}
-	RECT_TWO,	// Rectangle{100,0,100,100}
-	RECT_THREE,	// Rectangle{200,0,100,100}
-	RECT_FOUR	// Rectangle{300,0,100,100}
+	RECT_ONE = 0,	
+	RECT_TWO,	
+	RECT_THREE,	
+	RECT_FOUR
 };
 
 enum GAME_FLAG
 {
-	GAME_IN_PLAY,
+	GAME_IN_PLAY = 0,
 	PREROUND,
 	DRUMROLL,
 	TARGET_MISSED,
@@ -32,11 +32,12 @@ enum GAME_FLAG
 	LOSE_TIMER,	// not implemented
 	FLAG_MUTE,
 	GAME_PAUSED,
-  LOSE_SCREEN,
-  SET_NAME
+	LOSE_SCREEN,
+	SET_NAME
 };
 
-enum BUTTON_ID
+// used to be BUTTON_ID. the order was preserved but it's been renamed to extend to all source rects.
+enum SOURCE_RECT_INDEX
 {
 	PLAY,
 	PLAY_AGAIN,
@@ -44,24 +45,39 @@ enum BUTTON_ID
 	MUTE,
 	PAUSE,
 	PAUSE_QUIT,
-  SKIP
+	SKIP,
+	UNMUTE,
+	TIME,
+	LEVEL,
+	NONTENDO,
+	YEAR,
+	STAR,
+	TIMES,
+	HIGHSCORE,
+	BIGSCORE,
+	SCORE,
+	POG_MINI,
+	OGNICK,
+	UPDATE_BUTTON,
+	CURSOR
 };
 
+/// DEPRECATED AS FUCK
 enum STORAGE_VALUE_POSITION
 {
-  HI_SCORE,
-  HI_SCORE2,
-  HI_SCORE3,
-  HI_SCORE4,
-  HI_SCORE5,
-  TEXTURE_PREFERENCE
+	HI_SCORE,
+	HI_SCORE2,
+	HI_SCORE3,
+	HI_SCORE4,
+	HI_SCORE5,
+	TEXTURE_PREFERENCE
 };
 
 enum SOUND_EFFECTS_INDEX
 {
-	MISS_SND =0,
-	LOSE_SND =1,
-	POINTS_SND =2
+	MISS_SND = 0,
+	LOSE_SND,
+	POINTS_SND
 };
 
 #endif

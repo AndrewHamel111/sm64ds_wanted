@@ -105,11 +105,6 @@ void LoadSounds(std::vector<std::vector<Sound>>* character_sounds, std::vector<s
 	bool f = false;
 	std::vector<string_vector> files = ReadSoundDir(&f);
 	
-	if (f)
-	{
-		std::cout<< "fuck man yoiu lose" << std::endl;
-	}
-	
 	// verify character_sounds and sound_effects aren't already populated
 	character_sounds->clear();
 	(*character_sounds) = std::vector<std::vector<Sound>>{4};
@@ -129,7 +124,6 @@ void LoadSounds(std::vector<std::vector<Sound>>* character_sounds, std::vector<s
 		}
 		else
 		{
-		std::cout<< "sound_effects" << std::endl;
 			int sz = files[i].size();
 			for(int j = 0; j < sz; j++)
 				(*sound_effects)[i - 4].push_back(LoadSound(files[i][j].c_str()));
@@ -154,8 +148,6 @@ void GetNames(std::vector<std::string>& names)
 	std::stringstream str(_str);
 	std::string s;
 	while (std::getline(str, s, ',')) names.push_back(s);
-
-	std::cout << names << std::endl;
 }
 
 void DownloadScores(score_vector& scores)
@@ -181,8 +173,6 @@ void DownloadScores(score_vector& scores)
 	// _scores now sorted in descending order
 	scores.clear();
 	scores = _scores;
-
-	std::cout << "DOWNLOADED " << scores.size() << " SCORES." << std::endl;
 }
 
 void UploadScore(score_pair score)

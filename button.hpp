@@ -65,11 +65,11 @@ bool ImageButtonEx(Rectangle bounds, Texture2D atlas, Rectangle source)
 	return q;
 }
 
-/// A simplified function only useable when buttons are associated with a BUTTON_ID
+/// A simplified function only useable when buttons are associated with a SOURCE_RECT_INDEX
 /// @param atlas The Texture2D sprite atlas the button image will come from.
-/// @param b_id The BUTTON_ID enum value corresponding to the button.
+/// @param b_id The SOURCE_RECT_INDEX enum value corresponding to the button. (used to be BUTTON_ID)
 /// @returns True iff the button is clicked on this frame.
-bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
+bool ImageButton(Texture2D atlas, SOURCE_RECT_INDEX b_id)
 {
 	Rectangle bounds;
 	Rectangle src;
@@ -77,29 +77,29 @@ bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 	if (b_id == PLAY)
 	{
 		bounds = RECT_BUTTON[PLAY];
-		src = RECT_PLAY;
+		src = SOURCE_RECT[PLAY];
 	}
 	else if (b_id == PLAY_AGAIN)
 	{
 		bounds = RECT_BUTTON[PLAY_AGAIN];
-		src = RECT_PLAY_AGAIN;
+		src = SOURCE_RECT[PLAY_AGAIN];
 	}
 	else if (b_id == QUIT)
 	{
 		bounds = RECT_BUTTON[QUIT];
-		src = RECT_QUIT;
+		src = SOURCE_RECT[QUIT];
 	}
 	else if (b_id == MUTE)
 	{
 		if (flags[FLAG_MUTE])
-			return ImageButtonSpriteSwap(RECT_BUTTON[MUTE], atlas, RECT_MUTED, RECT_UNMUTED);
+			return ImageButtonSpriteSwap(RECT_BUTTON[MUTE], atlas, SOURCE_RECT[UNMUTE], SOURCE_RECT[MUTE]);
 		else
-			return ImageButtonSpriteSwap(RECT_BUTTON[MUTE], atlas, RECT_UNMUTED, RECT_MUTED);
+			return ImageButtonSpriteSwap(RECT_BUTTON[MUTE], atlas, SOURCE_RECT[MUTE], SOURCE_RECT[UNMUTE]);
 	}
 	else if (b_id == PAUSE)
 	{
 		bounds = RECT_BUTTON[PAUSE];
-		src = RECT_PAUSE;
+		src = SOURCE_RECT[PAUSE];
 	}
 	else if (b_id == SKIP)
 	{
@@ -115,7 +115,7 @@ bool ImageButton(Texture2D atlas, BUTTON_ID b_id)
 		}
 
 		// draw the button
-		DrawTextureRec(atlas, RECT_UNMUTED, Vector2{bounds.x,bounds.y}, c);
+		DrawTextureRec(atlas, SOURCE_RECT[MUTE], Vector2{bounds.x,bounds.y}, c);
 		if (p)
 		{
 			// TODO consider moving this text to below the icon

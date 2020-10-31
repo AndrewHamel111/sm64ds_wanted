@@ -17,7 +17,6 @@
 #define NEARBLACK CLITERAL(Color){ 20, 20, 20, 255}
 #define MUSTARD CLITERAL(Color){ 203, 182, 51, 255}
 
-//#include "HTTPRequest.hpp"
 #include "network.hpp"
 	
 #include "jute.h"
@@ -46,27 +45,32 @@ Rectangle posterSourceRects[] = { Rectangle{76,316,100,100}, Rectangle{332,316,1
 
 Rectangle posterSourceRect = Rectangle{0,100, 256, 192};
 
-Rectangle RECT_TIME 		= Rectangle{256, 100, 64, 16};
-Rectangle RECT_LEVEL 		= Rectangle{320, 100, 150, 30};
-Rectangle RECT_PLAY 		= Rectangle{256, 130, 256, 76};
-Rectangle RECT_PLAY_AGAIN 	= Rectangle{512, 130, 256, 76};
-Rectangle RECT_QUIT 		= Rectangle{768, 130, 256, 76};
-Rectangle RECT_NONTENDO	 	= Rectangle{256, 206, 312, 80};
-Rectangle RECT_2020 		= Rectangle{256, 286, 112, 30};
-Rectangle RECT_UNMUTED		= Rectangle{568, 206, 80, 80};
-Rectangle RECT_MUTED		= Rectangle{648, 206, 80, 80};
-Rectangle RECT_PAUSE		= Rectangle{768, 206, 256, 76};
+#include "enums.hpp"
 
-Rectangle RECT_STAR			= Rectangle{770, 100, 30, 30};
-Rectangle RECT_TIMES		= Rectangle{770 + 30, 100, 30, 30};
-Rectangle RECT_HIGHSCORE= Rectangle{830, 			100, 133, 15};
-Rectangle RECT_BIGSCORE= Rectangle{700, 416, 266, 30};
-Rectangle RECT_SCORE		= Rectangle{830 + 63, 100, 70, 15};
-
-Rectangle RECT_POG_MINI = Rectangle{963, 100, 30, 30};
-Rectangle RECT_OGNICK = Rectangle{0, 416, 100, 100};
-Rectangle RECT_UPDATE_BUTTON = Rectangle{300, 416, 312, 80};
-Rectangle RECT_CURSOR = Rectangle{612, 416, 88, 88};
+// use SOURCE_RECT_INDEX for this one
+Rectangle SOURCE_RECT[] = {
+	Rectangle{256, 130, 256, 76}, 			// PLAY
+	Rectangle{512, 130, 256, 76},			// PLAY_AGAIN
+	Rectangle{768, 130, 256, 76}, 			// QUIT
+	Rectangle{568, 206, 80,  80},			// MUTE
+	Rectangle{768, 206, 256, 76}, 			// PAUSE
+	Rectangle{768, 206, 256, 76},			// PAUSE_QUIT
+	Rectangle{568, 206, 80,  80},			// SKIP
+	Rectangle{648, 206, 80,  80}, 			// UNMUTE
+	Rectangle{256, 100, 64,  16},			// TIME
+	Rectangle{320, 100, 150, 30}, 			// LEVEL
+	Rectangle{256, 206, 312, 80}, 			// NONTENDO
+	Rectangle{256, 286, 112, 30}, 			// 2020 (YEAR)
+	Rectangle{770, 100, 30,  30},			// STAR
+	Rectangle{800, 100, 30,  30},			// TIMES
+	Rectangle{830, 100, 133, 15},			// HIGHSCORE
+	Rectangle{700, 416, 266, 30},			// BIGSCORE
+	Rectangle{893, 100, 70,  15}, 			// SCORE
+	Rectangle{963, 100, 30,  30}, 			// POG_MINI
+	Rectangle{0	 , 416, 100, 100}, 			// OGNICK
+	Rectangle{300, 416, 312, 80}, 			// UPDATE_BUTTON
+	Rectangle{612, 416, 88,  88} 			// CURSOR
+};
 
 
 int alarm[ALARMFLAG_COUNT] = {0};	// linked with flags by enum GAME_FLAG
@@ -91,6 +95,7 @@ std::string player_name = "[NAME]";
 char player_name_placeholder[30] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
 score_vector scores;
 
+/// toggle used in end screen to filter out non-nicktober names
 bool nicktoberNamesOnly = false;
 
 std::vector<std::string> nicktober_names;
@@ -103,15 +108,21 @@ Vector2 virtualCursorPos{0,0};
 bool mouseOutOfBounds = false;
 int cheese_keys[] = {KEY_LEFT_SUPER, KEY_RIGHT_SUPER, KEY_LEFT_ALT, KEY_RIGHT_ALT, KEY_KB_MENU, KEY_LEFT_CONTROL, KEY_RIGHT_CONTROL};
 
-#include "enums.hpp"
 #include "target.hpp"
 #include "utilities.hpp"
 #include "operators.hpp"
 #include "gameFuncs.hpp"
 
-Rectangle RECT_BUTTON[] = { Rectangle{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 304 - 38, 256, 76}, Rectangle{SCREEN_WIDTH/2 - 128, AREA_HEIGHT/2 - 38, 256, 76} , Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 228, 256, 76},
-							Rectangle{SCREEN_WIDTH - 80 - 8, AREA_HEIGHT + 8, 80, 80}, Rectangle{SCREEN_WIDTH - 256 - 8, SCREEN_HEIGHT - 76 - 8, 256, 76}, Rectangle{8, SCREEN_HEIGHT - 76 - 8, 256, 76},
-						 Rectangle{8 + 16, AREA_HEIGHT + 8, 50, 80} };
+// dest rects / bounds for each button. joined with SOURCE_RECT_INDEX for simplicity
+Rectangle RECT_BUTTON[] = {
+	Rectangle{SCREEN_WIDTH/2 - 128,	SCREEN_HEIGHT - 266,256, 76},	//PLAY
+	Rectangle{SCREEN_WIDTH/2 - 128, AREA_HEIGHT/2 - 38, 256, 76} ,	//PLAY_AGAIN
+	Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 190,256, 76},	//QUIT
+	Rectangle{SCREEN_WIDTH - 88, 	AREA_HEIGHT + 8, 	80,  80},	//MUTE
+	Rectangle{SCREEN_WIDTH - 264, 	SCREEN_HEIGHT - 84, 256, 76},	//PAUSE
+	Rectangle{8, 					SCREEN_HEIGHT - 84, 256, 76},	//PAUSE_QUIT
+	Rectangle{24, 					AREA_HEIGHT + 8, 	50,  80}	//SKIP
+};
 
 #include "button.hpp"
 #include "files.hpp"
@@ -208,7 +219,6 @@ int main(void)
 
 // retrieve scoreboard from server
 	DownloadScores(scores);
-	std::cout << scores.size() << std::endl;
 // retrieve valid nicktober_names
 	GetNames(nicktober_names);
 
@@ -263,8 +273,8 @@ int main(void)
 		Vector2 v1 = Vector2{25, (static_cast<float>(i + 1) / 4) * SCREEN_HEIGHT};
 		Vector2 v2 = Vector2{SCREEN_WIDTH - 125, SCREEN_HEIGHT - v1.y - 100};
 
-		target t1 = target(v1, DIRECTION_ANGLE, 3*PI/2, BASE_SPEED/2, criminalPosterRects[i]);
-		target t2 = target(v2, DIRECTION_ANGLE, PI/2, 	BASE_SPEED/2, criminalPosterRects[i]);
+		target t1 = target(v1, DIRECTION_ANGLE, 3*PI/2, BASE_SPEED/2, i);
+		target t2 = target(v2, DIRECTION_ANGLE, PI/2, 	BASE_SPEED/2, i);
 
 		t1.setAsMenuTarget();
 		t2.setAsMenuTarget();
@@ -301,7 +311,6 @@ int main(void)
 	std::vector<Music> bgm;
 	Sound currentSound;
 	
-	std::cout << "cum" << std::endl;
 	// load all the sounds from files
 	LoadSounds(&character_sounds, &sound_effects, &bgm);
 	
@@ -325,7 +334,7 @@ int main(void)
 	}
 
 	SetTargetFPS(FPS_TARGET);               // Set framerate
-	SetExitKey(KEY_ESCAPE);
+	SetExitKey(-1);
 
 	PlayMusicStream(bgm[currentSongIndex]);
 
@@ -362,7 +371,7 @@ int main(void)
 		else
 			UpdateMusicStream(bgm[currentSongIndex]);
 	
-		SetMasterVolume(volumePercent);
+		SetMasterVolume(volumePercent/5);
 
 		// TICK ALARMS
 		if (!pauseFlag && !mouseOutOfBounds)
@@ -446,6 +455,8 @@ int main(void)
 		//----------------------------------------------------------------------------------
 		// TODO: Update your variables here
 		//----------------------------------------------------------------------------------
+
+		if (IsKeyPressed(KEY_ESCAPE)) pauseFlag = !pauseFlag;
 
 		// PAUSE UPDATE
 		if (flags[SET_NAME])
@@ -603,72 +614,40 @@ int main(void)
 								flags[GAME_IN_PLAY] = false;
 
 								int i;
-								float j = 1.0f;
-								// TODO replace this with a system to calculate the duration of each sound effect
+								float soundDuration = 1.0f;
+								
+								i = rand() % character_sounds[allTargets[0].getSpriteRect()].size();
+								currentSound = character_sounds[allTargets[0].getSpriteRect()][i];
+								
+								/*
+								// GET FUCKED
 								if (allTargets[0].getSpriteRect() == criminalPosterRects[RECT_ONE])
 								{
 									i = rand() % character_sounds[0].size();
-									switch(i)
-									{
-										case 0: // 3
-											j = 2.814f;
-											break;
-										case 1: // 3
-											j = 2.947f;
-											break;
-										case 2: // 3.5
-											j = 3.490f;
-									}
 									currentSound = character_sounds[0][i];
 								}
 								else if (allTargets[0].getSpriteRect() == criminalPosterRects[RECT_TWO])
 								{
 									i = rand() % character_sounds[1].size();
-									switch(i)
-									{
-										case 0:
-											j = 1.945f;
-											break;
-										case 1:
-											j = 1.972f;
-									}
 									currentSound = character_sounds[1][i];
 								}
 								else if (allTargets[0].getSpriteRect() == criminalPosterRects[RECT_THREE])
 								{
 									i = rand() % character_sounds[2].size();
-									switch(i)
-									{
-										case 0:
-											j = 3.43f;
-											break;
-										case 1:
-											j = 2.731f;
-									}
 									currentSound = character_sounds[2][i];
 								}
 								else
 								{
 									i = rand() % character_sounds[3].size();
-									switch(i)
-									{
-										case 0:
-											j = 0.512f;
-											break;
-										case 1:
-											j = 0.544f;
-											break;
-										case 2:
-											j = 2.77f;
-											break;
-										case 3:
-											j = 2.16f;
-									}
 									currentSound = character_sounds[3][i];
 								}
+								*/
 
-								alarm[TARGET_HIGHLIGHT] = static_cast<int>(j * FPS_TARGET);
-								std::cout << "alarm: " << alarm[TARGET_HIGHLIGHT] << std::endl;
+								// ripped from GetMusicTimeLength(Music)
+								// line 1482 of raudio.c
+								soundDuration = (float)currentSound.sampleCount/(currentSound.stream.sampleRate*currentSound.stream.channels);
+
+								alarm[TARGET_HIGHLIGHT] = static_cast<int>(soundDuration * FPS_TARGET);
 								PlaySoundMulti(currentSound);
 							}
 							else	// MISSED TARGET
@@ -829,7 +808,7 @@ int main(void)
 				
 				buttonQuit = ImageButton(atlas, QUIT);
 				
-				if (drawUpdateButton && ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 154,360, 312,80}, atlas, RECT_UPDATE_BUTTON))
+				if (drawUpdateButton && ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 154,360, 312,80}, atlas, SOURCE_RECT[UPDATE_BUTTON]))
 				{
 					OpenURL(downloadURL.c_str());
 				}
@@ -850,7 +829,7 @@ int main(void)
 					if (ImageButton(atlas, PAUSE))
 						pauseFlag = false;
 
-					if (ImageButtonEx(RECT_BUTTON[PAUSE_QUIT], atlas, RECT_QUIT))
+					if (ImageButtonEx(RECT_BUTTON[PAUSE_QUIT], atlas, SOURCE_RECT[QUIT]))
 					{
 						UpdateScores(scores, make_pair(player_name, level - 1));
 
@@ -879,7 +858,7 @@ int main(void)
 					score_pair myScore = make_pair(player_name, (level > 0) ? level - 1 : 0);
 					
 					// HIGH SCORE text
-					DrawTextureRec(atlas, RECT_BIGSCORE, Vector2{AREA_WIDTH/2 - 133, 30}, WHITE);
+					DrawTextureRec(atlas, SOURCE_RECT[BIGSCORE], Vector2{AREA_WIDTH/2 - 133, 30}, WHITE);
 
 					// display scores
 					auto iter = scores.begin(), iEnd = scores.end();
@@ -905,8 +884,8 @@ int main(void)
 						//float sc = static_cast<float>(scoreCounter);
 
 						// draw stars & the times symbol
-						DrawTextureRec(atlas, RECT_STAR,  Vector2{AREA_WIDTH/2 - 75, (float)((2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15)}, WHITE);
-						DrawTextureRec(atlas, RECT_TIMES, Vector2{AREA_WIDTH/2 - 45,  (float)((2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15)}, WHITE);
+						DrawTextureRec(atlas, SOURCE_RECT[STAR],  Vector2{AREA_WIDTH/2 - 75, (float)((2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15)}, WHITE);
+						DrawTextureRec(atlas, SOURCE_RECT[TIMES], Vector2{AREA_WIDTH/2 - 45,  (float)((2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15)}, WHITE);
 	
 						// draw player's name
 						
@@ -925,7 +904,7 @@ int main(void)
 							if (iter->second > 999) xOff += 30;
 							if (iter->second > 99) xOff += 30;
 							if (iter->second > 9) xOff += 30;
-							DrawTextureRec(atlas, RECT_POG_MINI, Vector2{AREA_WIDTH/2 + xOff, (float)((2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15)}, WHITE);
+							DrawTextureRec(atlas, SOURCE_RECT[POG_MINI], Vector2{AREA_WIDTH/2 + xOff, (float)((2*scoreCounter + 3)*(SCREEN_HEIGHT - 228)/18 + 15)}, WHITE);
 						}
 
 						lowestHighScore = *iter;
@@ -953,8 +932,8 @@ int main(void)
 					if (myScore.second < lowestHighScore.second && !myScoreIsInTheTopFiveFuckYes)
 					{						
 						// draw stars & the times symbol (FOR BEST ROUND)
-						DrawTextureRec(atlas, RECT_STAR,  Vector2{AREA_WIDTH/2 - 75, 14*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
-						DrawTextureRec(atlas, RECT_TIMES, Vector2{AREA_WIDTH/2 - 45,  14*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
+						DrawTextureRec(atlas, SOURCE_RECT[STAR],  Vector2{AREA_WIDTH/2 - 75, 14*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
+						DrawTextureRec(atlas, SOURCE_RECT[TIMES], Vector2{AREA_WIDTH/2 - 45,  14*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
 
 						// draw the scores using DrawNumberAt (FOR BEST ROUND)
 						DrawNumberAtLeftJustified(atlas, myBestScore.second, Vector2{AREA_WIDTH/2, 14*(SCREEN_HEIGHT - 228)/18});
@@ -972,8 +951,8 @@ int main(void)
 					
 					
 					// draw stars & the times symbol (for THIS ROUND)
-					DrawTextureRec(atlas, RECT_STAR,  Vector2{AREA_WIDTH/2 - 75, 16*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
-					DrawTextureRec(atlas, RECT_TIMES, Vector2{AREA_WIDTH/2 - 45,  16*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
+					DrawTextureRec(atlas, SOURCE_RECT[STAR],  Vector2{AREA_WIDTH/2 - 75, 16*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
+					DrawTextureRec(atlas, SOURCE_RECT[TIMES], Vector2{AREA_WIDTH/2 - 45,  16*(SCREEN_HEIGHT - 228)/18 + 15}, WHITE);
 
 					// draw the scores using DrawNumberAt (for THIS ROUND)
 					DrawNumberAtLeftJustified(atlas, myScore.second, Vector2{AREA_WIDTH/2, 16*(SCREEN_HEIGHT - 228)/18});
@@ -981,8 +960,8 @@ int main(void)
 					// THIS ROUND label;
 					DrawText("THIS ROUND", 550, 16*(SCREEN_HEIGHT - 228)/18 + 20, 20, LIGHTGRAY);
 
-					buttonStart = ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*3, 256, 76}, atlas, RECT_PLAY_AGAIN);
-					buttonReturnToMenu = ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*2, 256, 76}, atlas, RECT_QUIT);
+					buttonStart = ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*3, 256, 76}, atlas, SOURCE_RECT[PLAY_AGAIN]);
+					buttonReturnToMenu = ImageButtonEx(Rectangle{SCREEN_WIDTH/2 - 128, SCREEN_HEIGHT - 76*2, 256, 76}, atlas, SOURCE_RECT[QUIT]);
 
 					// show full leaderboard button
 					Color _col = RAYWHITE;
@@ -998,7 +977,7 @@ int main(void)
 						DrawText("SHOW NICKTOBER SCORES", 105, 80, 12, RAYWHITE);
 
 					// toggle nicktober button
-					if (nicktoberNamesOnly && ImageButtonEx(Rectangle{0,0,100,100}, atlas, RECT_OGNICK))
+					if (nicktoberNamesOnly && ImageButtonEx(Rectangle{0,0,100,100}, atlas, SOURCE_RECT[OGNICK]))
 						nicktoberNamesOnly = false;
 					else if (!nicktoberNamesOnly && ImageButtonEx(Rectangle{0,0,100,100}, atlas, criminalPosterRects[2]))
 						nicktoberNamesOnly = true;
@@ -1028,7 +1007,7 @@ int main(void)
 				else if (flags[ROUND_BUFFER])	// Show name of the round
 				{
 					ClearBackground(NEARBLACK);
-					DrawTextureRec(atlas, RECT_LEVEL, Vector2{SCREEN_WIDTH/2 - 75, AREA_HEIGHT/2 - 15}, WHITE);
+					DrawTextureRec(atlas, SOURCE_RECT[LEVEL], Vector2{SCREEN_WIDTH/2 - 75, AREA_HEIGHT/2 - 15}, WHITE);
 					DrawNumberAt(atlas, level, Vector2{SCREEN_WIDTH/2, AREA_HEIGHT/2 + 8});
 				}
 				// DRUMROLL DRAW	NOT YET IMPLEMENTED AND MIGHT BE DEPRECATED, BREAKS FLOW ALOT
@@ -1065,27 +1044,21 @@ int main(void)
 						DrawTarget(allTargets[0], atlas);
 					}
 
-					Rectangle r = allTargets[0].getSpriteRect();
+					Rectangle r = criminalPosterRects[allTargets[0].getSpriteRect()];
 
-					#ifdef USE_DS_STYLE
-					// DS version (uses a faces_alt)
 					// translate the source rect over to the alt side
 					r.y += 316;
-					#else
-					// My version (uses the base faces)
-					// don't change the spriterect
-					#endif
 
 					DrawRectangleRec(bottomBarRect, NEARBLACK);
 					DrawTextureRec(atlas, posterSourceRect, posterPos, WHITE);
 					DrawTextureRec(atlas, r, Vector2{posterPos.x + 80,posterPos.y + 19}, WHITE);
 
 					// draw current score
-					DrawTextureRec(atlas, RECT_SCORE, Vector2{posterPos.x - 32 - 70, posterPos.y + 8}, WHITE);
+					DrawTextureRec(atlas, SOURCE_RECT[SCORE], Vector2{posterPos.x - 32 - 70, posterPos.y + 8}, WHITE);
 					DrawNumberAt(atlas, level - 1, Vector2{posterPos.x - 32 - 35, posterPos.y + 23});
 
 					// draw time left
-					DrawTextureRec(atlas, RECT_TIME, Vector2{posterPos.x + 288, posterPos.y + 8}, WHITE);
+					DrawTextureRec(atlas, SOURCE_RECT[TIME], Vector2{posterPos.x + 288, posterPos.y + 8}, WHITE);
 					DrawTimerAt(atlas, counter[1], Vector2{posterPos.x + 320, posterPos.y + 23});
 
 					// draw miss text if the TARGET_MISSED still be goin
@@ -1126,7 +1099,7 @@ int main(void)
 			}
 			
 			// Draw Virtual Cursor ALWAYS
-			DrawTextureRec(atlas, RECT_CURSOR, virtualCursorPos, RAYWHITE);
+			DrawTextureRec(atlas, SOURCE_RECT[CURSOR], virtualCursorPos, RAYWHITE);
 			
 			// If cursor is off screen, remind the player they can return it to the screen.
 			if (mouseOutOfBounds)
