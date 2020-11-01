@@ -1,6 +1,7 @@
 <html>
 <head>
 	<title>NICK GAME LEADERBOARD</title>
+	<link rel="icon" href="favicon.png">
 	<style>
 		div#leftDiv {
 			padding: 0px 3% 30px 3%;
