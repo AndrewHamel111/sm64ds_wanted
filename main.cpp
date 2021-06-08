@@ -7,7 +7,7 @@
 - since updateTargets use GetTime() - startTime, pausing doesn't effect this so sin rounds will have some weird behaviour]
 
 	V1.04 CHANGES
-	 
+- lots of under the hood improvements
 
 ********************************************************************************************/
 

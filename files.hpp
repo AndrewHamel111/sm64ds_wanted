@@ -158,10 +158,10 @@ void DownloadScores(score_vector& scores)
 	std::string str = getBodyFromURL("http://hamel111.myweb.cs.uwindsor.ca/sm64games/wanted/scoreboard.json");
 
 	jute::jValue board = jute::parser::parse(str);
+//	std::cout << "jute type is " << board.get_type() << std::endl;
 
 	std::vector<std::string> keys = board.get_keys();
 	int s = keys.size();
-
 
 	score_vector _scores;
 	for(int i = 0; i < s; i++)
