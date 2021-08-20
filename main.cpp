@@ -16,6 +16,12 @@
 #include "raylib.h"
 #define NEARBLACK CLITERAL(Color){ 20, 20, 20, 255}
 #define MUSTARD CLITERAL(Color){ 203, 182, 51, 255}
+#ifndef SILVER
+#define SILVER CLITERAL(Color){217, 238, 255, 255}
+#endif
+#ifndef BRONZE
+#define BRONZE CLITERAL(Color){153, 109, 38, 255}
+#endif
 
 #include "network.hpp"
 	
@@ -876,9 +882,10 @@ int main(void)
 						}
 
 						Color col;
+						
 						if (scoreCounter == 0) col = GOLD;
-						else if (scoreCounter == 1) col = Color{ 217, 238, 255, 255};	// SILVER
-						else if (scoreCounter == 2) col = Color{ 153, 109, 38, 255 };	// BRONZE
+						else if (scoreCounter == 1) col = SILVER;	// SILVER
+						else if (scoreCounter == 2) col = BRONZE;	// BRONZE
 						else col = LIGHTGRAY;
 
 						//float sc = static_cast<float>(scoreCounter);
